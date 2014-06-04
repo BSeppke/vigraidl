@@ -1,7 +1,7 @@
 
 FUNCTION vigraidl_path
   CD, CURRENT=CDIR
-  RETURN, CDIR
+  RETURN, CDIR +"/"
 END
 
 FUNCTION vigraidl_version
@@ -32,7 +32,7 @@ FUNCTION base_login_script
 END
 
 FUNCTION vigra_c_path 
-  RETURN, vigraidl_path() +'/vigra_c/'
+  RETURN, vigraidl_path() +'vigra_c/'
 END
 
 FUNCTION login_script
