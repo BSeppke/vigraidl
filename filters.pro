@@ -405,7 +405,7 @@ FUNCTION vigra_simplesharpening_c, array, array2, width, height, sharpening_fact
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
-FUNCTION sharpening_band, array, sharpening_factor, scale
+FUNCTION sharpening_band, array, sharpening_factor
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
   err = vigra_simplesharpening_c(array, array2, shape[1], shape[2],  sharpening_factor)
@@ -415,11 +415,11 @@ FUNCTION sharpening_band, array, sharpening_factor, scale
   ENDCASE
 END
 
-FUNCTION sharpening, array, sharpening_factor, scale
+FUNCTION sharpening, array, sharpening_factor
   shape = SIZE(array)
   res_array =  array
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = sharpening_band(REFORM(array[band,*,*]), sharpening_factor, scale)
+	res_array[band,*,*] = sharpening_band(REFORM(array[band,*,*]), sharpening_factor)
   ENDFOR
   RETURN, res_array
 END

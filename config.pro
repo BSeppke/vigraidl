@@ -22,9 +22,8 @@ FUNCTION dylib_path
   RETURN, vigraidl_path() + dylib_file()
 END
 
-FUNCTION build_platform
-  IF !version.OS EQ 'darwin' THEN   RETURN, 'macosx' + idl_bits() ELSE $
-  IF !version.OS EQ 'linux' THEN    RETURN, 'unix'  + idl_bits() ELSE MESSAGE, 'Error: Only macosx and unix are supported for auto-build of vigra_c'
+FUNCTION cmake_flags
+  IF idl_bits() EQ 32 THEN   RETURN, '-DCMAKE_CXX_FLAGS=-m32 -DCMAKE_C_FLAGS=-m32'  ELSE RETURN, ''
 END
 
 FUNCTION base_login_script
@@ -57,7 +56,7 @@ FUNCTION build_vigra_c
   IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
     IF vigra_installed() EQ 0 THEN BEGIN
       PRINT, '-------------- BUILDING VIGRA-C-WRAPPER FOR COMPUTER VISION AND IMAGE PROCESSING TASKS --------------'
-      IF system_env('cd ' + vigra_c_path() + '&& make ' + build_platform()) EQ 0 THEN BEGIN
+      IF system_env('cd ' + vigra_c_path() + ' && mkdir -p build && cd build && cmake ' + cmake_flags() + ' .. && make && cd .. && rm -rf ./build') EQ 0 THEN BEGIN
         FILE_COPY, vigra_c_path() + 'bin/' + dylib_file(), dylib_path(), /OVERWRITE
       ENDIF ELSE BEGIN 
         MESSAGE, 'making the vigra_c lib failed, although vigra seems to be installed'
