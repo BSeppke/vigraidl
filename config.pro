@@ -67,7 +67,6 @@ FUNCTION build_vigra_c
   ENDIF ELSE IF !version.OS_FAMILY EQ 'windows' THEN BEGIN
     bindir = vigra_c_path() + 'bin/' + 'win' + idl_bits() + '/'
     SPAWN, 'copy ' + bindir + '*.dll ' + vigraidl_path()
-    SPAWN, 'copy ' + vigraidl_path() + 'zlib.dll ' + vigraidl_path() + '/zlibwapi.dll'
   ENDIF ELSE BEGIN
     MESSAGE, 'Only Mac OS X, Unix and Windows are supported for auto build of vigra_c!'
   ENDELSE
