@@ -476,3 +476,30 @@ FUNCTION distancetransform, array, background_label, norm
   ENDFOR
   RETURN, res_array
 END
+
+;###############################################################################
+;###################             Shock Filter               ####################
+FUNCTION vigra_shockfilter_c, array, array2, width, height, sigma, rho, upwind_factor_h, iterations
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_shockfilter_c', array, array2, FIX(width), FIX(height), FLOAT(sigma), FLOAT(rho), FLOAT(upwind_factor_h), FIX(iterations), $
+              VALUE=[0,0,1,1,1,1,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION shockfilter_band, array, sigma, rho, upwind_factor_h, iterations
+  shape = SIZE(array)
+  array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_shockfilter_c(array, array2, shape[1], shape[2], sigma, rho, upwind_factor_h, iterations)
+  CASE err OF
+    0:  RETURN, array2 
+    1:  MESSAGE, "Error in vigraidl.filters.shockfilter: Shock filtering failed!!"
+    2:  MESSAGE, "Error in vigraidl.filters.shockfilter: Iterations must be > 0!!"
+  ENDCASE
+END
+
+FUNCTION shockfilter, array, sigma, rho, upwind_factor_h, iterations
+  shape = SIZE(array)
+  res_array =  array
+  FOR band = 0, shape[1]-1 DO BEGIN
+	res_array[band,*,*] = shockfilter_band(REFORM(array[band,*,*]), sigma, rho, upwind_factor_h, iterations)
+  ENDFOR
+  RETURN, res_array
+END

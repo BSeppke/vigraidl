@@ -79,6 +79,7 @@ FUNCTION affinewarpimage, array, affineMat, resize_mode
   ENDFOR
   RETURN, res_array
 END
+
 ;###############################################################################
 ;###################         Reflect image                  ####################
 FUNCTION vigra_reflectimage_c, array, array2, width, height, reflect_mode
@@ -132,3 +133,109 @@ FUNCTION fouriertransform, array
   ENDFOR
   RETURN, res_array
 END
+
+;###############################################################################
+;###################         Fast cross correlation         ####################
+FUNCTION vigra_fastcrosscorrelation_c, array, array2, array3, width, height, mask_width, mask_height
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fastcrosscorrelation_c', array, array2,  array3, FIX(width), FIX(height), FIX(mask_width), FIX(mask_height), $
+              VALUE=[0,0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION fastcrosscorrelation_band, array, mask
+  shape = SIZE(array)
+  mask_shape = SIZE(mask)
+  array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_fastcrosscorrelation_c(array, mask, array2, shape[1], shape[2], mask_shape[1], mask_shape[2])
+  CASE err OF
+    0: RETURN, array2
+    1: MESSAGE, "Error in vigraidl.imgproc:fastcrosscorrelation: Fast cross-correlation of image failed!!"
+  ENDCASE
+END
+
+FUNCTION fastcrosscorrelation, array, mask
+  shape = SIZE(array)
+  res_array =  array
+  FOR band = 0, shape[1]-1 DO BEGIN
+	res_array[band,*,*] = fastcrosscorrelation_band(REFORM(array[band,*,*]), REFORM(mask[band,*,*]))
+  ENDFOR
+  RETURN, res_array
+END	  
+
+;###############################################################################
+;###################   Fast normalized cross correlation    ####################
+FUNCTION vigra_fastnormalizedcrosscorrelation_c, array, array2, array3, width, height, mask_width, mask_height
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fastnormalizedcrosscorrelation_c', array, array2,  array3, FIX(width), FIX(height), FIX(mask_width), FIX(mask_height), $
+              VALUE=[0,0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION fastnormalizedcrosscorrelation_band, array, mask
+  shape = SIZE(array)
+  mask_shape = SIZE(mask)
+  array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_fastnormalizedcrosscorrelation_c(array, mask, array2, shape[1], shape[2], mask_shape[1], mask_shape[2])
+  CASE err OF
+    0: RETURN, array2
+    1: MESSAGE, "Error in vigraidl.imgproc:fastnormalizedcrosscorrelation: Fast normalized cross-correlation of image failed!!"
+  ENDCASE
+END
+
+FUNCTION fastnormalizedcrosscorrelation, array, mask
+  shape = SIZE(array)
+  res_array =  array
+  FOR band = 0, shape[1]-1 DO BEGIN
+	res_array[band,*,*] = fastnormalizedcrosscorrelation_band(REFORM(array[band,*,*]), REFORM(mask[band,*,*]))
+  ENDFOR
+  RETURN, res_array
+END	  
+
+;###############################################################################
+;###################        Local maxima extraction         ####################
+FUNCTION vigra_localmaxima_c, array, array2, width, height
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localmaxima_c', array, array2, FIX(width), FIX(height),  $
+              VALUE=[0,0,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION localmaxima_band, array
+  shape = SIZE(array)
+  array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_localmaxima_c(array, array2, shape[1], shape[2])
+  CASE err OF
+    0: RETURN, array2
+    1: MESSAGE, "Error in vigraidl.imgproc:localmaxima: Extraction of local maxima of the image failed!!"
+  ENDCASE
+END
+
+FUNCTION localmaxima, array
+  shape = SIZE(array)
+  res_array =  array
+  FOR band = 0, shape[1]-1 DO BEGIN
+	res_array[band,*,*] = localmaxima_band(REFORM(array[band,*,*]))
+  ENDFOR
+  RETURN, res_array
+END	  
+
+;###############################################################################
+;###################        Local minima extraction         ####################
+FUNCTION vigra_localminima_c, array, array2, width, height
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localminima_c', array, array2, FIX(width), FIX(height),  $
+              VALUE=[0,0,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION localminima_band, array
+  shape = SIZE(array)
+  array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_localminima_c(array, array2, shape[1], shape[2])
+  CASE err OF
+    0: RETURN, array2
+    1: MESSAGE, "Error in vigraidl.imgproc:localminima: Extraction of local minima of the image failed!!"
+  ENDCASE
+END
+
+FUNCTION localminima, array
+  shape = SIZE(array)
+  res_array =  array
+  FOR band = 0, shape[1]-1 DO BEGIN
+	res_array[band,*,*] = localminima_band(REFORM(array[band,*,*]))
+  ENDFOR
+  RETURN, res_array
+END	  

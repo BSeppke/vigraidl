@@ -46,15 +46,28 @@ FUNCTION system_env, arg
  SPAWN, login_cmd() + ' && ' + arg
 END
 
+FUNCTION vigra_version
+ SPAWN, login_cmd() + ' && vigra-config --version', version_string
+ PRINT, version_string
+ RETURN, STRSPLIT(version_string, '.', /EXTRACT)
+END
+
 FUNCTION vigra_installed
-  PRINT, 'Searching for vigra using <vigra-config --version>'
-  RETURN, system_env('vigra-config --version')
+  PRINT, 'Searching for vigra >= 1.11.0 using <vigra-config --version>'
+  ver = vigra_version()
+  ver_size = SIZE(ver)
+  IF (ver_size[1] EQ 3) THEN BEGIN
+    IF  (ver[0] EQ 1 AND ver[1] GE 11) OR (ver[0] GT 1) THEN BEGIN
+      RETURN, 1
+    ENDIF
+  ENDIF
+  RETURN, 0
 END
 
 ; The compilation routine (at least for macosx and unix)
 FUNCTION build_vigra_c
   IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
-    IF vigra_installed() EQ 0 THEN BEGIN
+    IF vigra_installed() THEN BEGIN
       PRINT, '-------------- BUILDING VIGRA-C-WRAPPER FOR COMPUTER VISION AND IMAGE PROCESSING TASKS --------------'
       IF system_env('cd ' + vigra_c_path() + ' && mkdir -p build && cd build && cmake ' + cmake_flags() + ' .. && make && cd .. && rm -rf ./build') EQ 0 THEN BEGIN
         FILE_COPY, vigra_c_path() + 'bin/' + dylib_file(), dylib_path(), /OVERWRITE
