@@ -12,9 +12,14 @@ PRINT, "loading lenna-image"
 img = loadimage(vigraidl_path() + "images/lenna_face.png")
 shape = SIZE(img)
 
-PRINT, "performance test gaussian smoothing"
-PRINT, "vigra-method [in ms]:"
-;(time (gsmooth img 0.3))
+PRINT, "testing subimage and correlation facilities"
+img_cut = subimage(img, 100, 50, 151, 101) ;;Mask needs to have odd size!
+
+fcc_res = fastcrosscorrelation(img, img_cut)
+fncc_res = fastnormalizedcrosscorrelation(img, img_cut)
+pos_matches = localmaxima(fncc_res)
+neg_matches = localminima(fncc_res)
+
 
 
 PRINT, "performing watershed transform on resized gradient image"

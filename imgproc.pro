@@ -239,3 +239,34 @@ FUNCTION localminima, array
   ENDFOR
   RETURN, res_array
 END	  
+
+;###############################################################################
+;###################             Subimage                   ####################
+FUNCTION vigra_subimage_c, array, array2, width, height, left, upper, right, lower
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_subimage_c', array, array2, FIX(width), FIX(height), FIX(left), FIX(upper), FIX(right), FIX(lower),  $
+    VALUE=[0,0,1,1,1,1,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION subimage_band, array, left, upper, right, lower
+  shape = SIZE(array)
+  cut_width = right - left
+  cut_height = lower - upper
+  array2 = MAKE_ARRAY(cut_width, cut_height, /FLOAT, VALUE = 0.0)
+  err = vigra_subimage_c(array, array2, shape[1], shape[2], left, upper, right, lower)
+  CASE err OF
+    0: RETURN, array2
+    1: MESSAGE, "Error in vigraidl.imgproc:subimage: Subimage extraction failed!!"
+    2: MESSAGE, "Error in vigraidl.imgproc:subimage: Constraints not fullfilled: left < right, upper < lower, right - left <= width, lower - upper <= height!!"
+  ENDCASE
+END
+
+FUNCTION  subimage, array, left, upper, right, lower
+  shape = SIZE(array)
+  cut_width = right - left
+  cut_height = lower - upper
+  res_array =  MAKE_ARRAY(shape[1], cut_width, cut_height, /FLOAT, VALUE = 0.0)
+  FOR band = 0, shape[1]-1 DO BEGIN
+    res_array[band,*,*] = subimage_band(REFORM(array[band,*,*]), left, upper, right, lower)
+  ENDFOR
+  RETURN, res_array
+END
