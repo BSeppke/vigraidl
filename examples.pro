@@ -12,6 +12,8 @@ PRINT, "loading lenna-image"
 img = loadimage(vigraidl_path() + "images/lenna_face.png")
 shape = SIZE(img)
 
+img_padd = paddimage(img, 10, 20, 30, 40)
+
 PRINT, "testing subimage and correlation facilities"
 img_cut = subimage(img, 100, 50, 151, 101) ;;Mask needs to have odd size!
 

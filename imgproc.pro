@@ -270,3 +270,39 @@ FUNCTION  subimage, array, left, upper, right, lower
   ENDFOR
   RETURN, res_array
 END
+
+;###############################################################################
+;###################             Subimage                   ####################
+FUNCTION vigra_paddimage_c, array, array2, width, height, left, upper, right, lower
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_paddimage_c', array, array2, FIX(width), FIX(height), FIX(left), FIX(upper), FIX(right), FIX(lower),  $
+    VALUE=[0,0,1,1,1,1,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION paddimage_band, array, left, upper, right, lower
+  shape = SIZE(array)
+  w = shape[1]
+  h = shape[2]
+  padd_width = right + w + left
+  padd_height = lower + h + upper
+  array2 = MAKE_ARRAY(padd_width, padd_height, /FLOAT, VALUE = 0.0)
+  err = vigra_paddimage_c(array, array2, w, h, left, upper, right, lower)
+  CASE err OF
+    0: RETURN, array2
+    1: MESSAGE, "Error in vigraidl.imgproc:paddimage: Padded image extraction failed!!"
+    2: MESSAGE, "Error in vigraidl.imgproc:paddimage: Constraints not fullfilled: left & right >=0, upper & lower >=0!!"
+  ENDCASE
+END
+
+FUNCTION  paddimage, array, left, upper, right, lower
+  shape = SIZE(array)
+  b = shape[1]
+  w = shape[2]
+  h = shape[3]
+  padd_width = right + w + left
+  padd_height = lower + h + upper
+  res_array =  MAKE_ARRAY(b, padd_width, padd_height, /FLOAT, VALUE = 0.0)
+  FOR band = 0, shape[1]-1 DO BEGIN
+    res_array[band,*,*] = paddimage_band(REFORM(array[band,*,*]), left, upper, right, lower)
+  ENDFOR
+  RETURN, res_array
+END
