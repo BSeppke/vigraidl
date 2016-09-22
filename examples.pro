@@ -141,26 +141,29 @@ PRINT, splineimageview_g2xy(siv, pos_x, pos_y)
 PRINT, splineimageview_g2yy(siv, pos_x, pos_y)
 
 PRINT, "saving resulting images"
-res = saveimage(img2, vigraidl_path() +  "images/lenna-relabeled-watersheds-on-resized-gradient-image.png")
 
-res = saveimage( REAL_PART(img3), vigraidl_path() +  "images/rect-fft-real.png")
-res = saveimage( IMAGINARY(img3) , vigraidl_path() +  "images/rect-fft-imag.png")
-res = saveimage( ABS(img3) , vigraidl_path() +  "images/rect-fft-magnitude.png")
-res = saveimage( SQRT(ABS(img3)) , vigraidl_path() +  "images/rect-fft-sqrt-magnitude.png")
+result_path = vigraidl_path() + "results/"
+FILE_MKDIR, result_path
 
-res = saveimage( img4 ,  vigraidl_path() +  "images/lenna-reflected-both.png")
-res = saveimage( img5 ,  vigraidl_path() +  "images/lenna-rotated-15deg.png")
-res = saveimage( img6 ,  vigraidl_path() +  "images/lenna-aff-rotated-15deg.png")
-res = saveimage( img7 ,  vigraidl_path() +  "images/lenna-disttransform-on-canny.png")
-res = saveimage( img8 ,  vigraidl_path() +  "images/lenna-diff_of_exp.png")
-res = saveimage( img9 ,  vigraidl_path() +  "images/lenna-gsmooth-3.0.png")
-res = saveimage( img10,  vigraidl_path() +  "images/lenna-log-3.0.png")
-res = saveimage( img11,  vigraidl_path() +  "images/lenna-gsharpening-0.5-3.0.png")
-res = saveimage( img12,  vigraidl_path() +  "images/lenna-sharpening-3.0.png")
-res = saveimage( img13,  vigraidl_path() +  "images/lenna-nonlineardiffusion-0.1-2.0.png")
-res = saveimage( img14,  vigraidl_path() +  "images/lenna-gauss-convolve.png")
-res = saveimage( img15,  vigraidl_path() +  "images/lenna-mean-convolve.png")
-res = saveimage( img16,  vigraidl_path() +  "images/lenna-sep-convolve.png")
+res = saveimage(img2, result_path + "lenna-relabeled-watersheds-on-resized-gradient-image.png")
 
+res = saveimage( REAL_PART(img3),  result_path + "rect-fft-real.png")
+res = saveimage( IMAGINARY(img3) , result_path + "rect-fft-imag.png")
+res = saveimage( ABS(img3) ,       result_path + "rect-fft-magnitude.png")
+res = saveimage( SQRT(ABS(img3)) , result_path + "rect-fft-sqrt-magnitude.png")
+
+res = saveimage( img4 ,  result_path + "lenna-reflected-both.png")
+res = saveimage( img5 ,  result_path + "lenna-rotated-15deg.png")
+res = saveimage( img6 ,  result_path + "lenna-aff-rotated-15deg.png")
+res = saveimage( img7 ,  result_path + "lenna-disttransform-on-canny.png")
+res = saveimage( img8 ,  result_path + "lenna-diff_of_exp.png")
+res = saveimage( img9 ,  result_path + "lenna-gsmooth-3.0.png")
+res = saveimage( img10,  result_path + "lenna-log-3.0.png")
+res = saveimage( img11,  result_path + "lenna-gsharpening-0.5-3.0.png")
+res = saveimage( img12,  result_path + "lenna-sharpening-3.0.png")
+res = saveimage( img13,  result_path + "lenna-nonlineardiffusion-0.1-2.0.png")
+res = saveimage( img14,  result_path + "lenna-gauss-convolve.png")
+res = saveimage( img15,  result_path + "lenna-mean-convolve.png")
+res = saveimage( img16,  result_path + "lenna-sep-convolve.png")
 
 end
