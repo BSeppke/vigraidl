@@ -143,7 +143,8 @@ PRINT, splineimageview_g2yy(siv, pos_x, pos_y)
 PRINT, "saving resulting images"
 
 result_path = vigraidl_path() + "results/"
-FILE_MKDIR, result_path
+
+IF FILE_TEST(result_path, /DIRECTORY) EQ 0 THEN FILE_MKDIR, result_path
 
 res = saveimage(img2, result_path + "lenna-relabeled-watersheds-on-resized-gradient-image.png")
 
