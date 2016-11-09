@@ -78,13 +78,13 @@ FUNCTION vigra_slic_rgb_c, array_r, array_g, array_b, array2, width, height, see
     VALUE=[0,0,0,0,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
-FUNCTION slic_rgb, array, seedDistance, intensityScaling, iterations
+FUNCTION slic_rgb, array_r, array_g, array_b, seedDistance, intensityScaling, iterations
   IF N_ELEMENTS(seedDistance) EQ 0 THEN seedDistance=15
   IF N_ELEMENTS(intensityScaling) EQ 0 THEN intensityScaling=20.0
   IF N_ELEMENTS(iterations) EQ 0 THEN iterations=40
-  shape = SIZE(array)
-  array2 = MAKE_ARRAY(1, shape[2], shape[3], /FLOAT, VALUE = 0.0)
-  err = vigra_slic_rgb_c(REFORM(array[0,*,*]), REFORM(array[1,*,*]), REFORM(array[2,*,*]), array2, shape[2], shape[3], seedDistance, intensityScaling, iterations)
+  shape = SIZE(array_r)
+  array2 = MAKE_ARRAY(1, shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_slic_rgb_c(array_r, array_g, array_b, array2, shape[1], shape[2], seedDistance, intensityScaling, iterations)
   IF err EQ -1 THEN BEGIN
     MESSAGE, "Error in vigraidl.segmentation.slic_rgb: SLIC segmentation of image failed!"
   ENDIF ELSE BEGIN
@@ -98,7 +98,7 @@ FUNCTION slic, array, seedDistance, intensityScaling, iterations
   IF N_ELEMENTS(iterations) EQ 0 THEN iterations=40
   shape = SIZE(array)
   IF shape[0] EQ 3 AND shape[1] EQ 3 THEN BEGIN
-    res_array = slic_rgb(array, seedDistance, intensityScaling, iterations)
+    res_array = slic_rgb(REFORM(array[0,*,*]), REFORM(array[1,*,*]), REFORM(array[2,*,*]), seedDistance, intensityScaling, iterations)
   ENDIF ELSE BEGIN
     res_array =  array
     FOR band = 0, shape[1]-1 DO BEGIN
