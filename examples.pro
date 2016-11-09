@@ -33,6 +33,12 @@ img2 = regionimagetocrackedgeimage( $
                       1.0))), $
                 0.0)
 
+PRINT, "performing slic segmentation on lenna image"
+img2_slic = regionimagetocrackedgeimage( slic(img), 0.0)
+
+PRINT, "performing slic segmentation on the red channel of the lenna image"
+img2red_slic = regionimagetocrackedgeimage( slic(img[0,*,*]), 0.0)
+
 PRINT, "performing fft on image"
 img3 = fouriertransform(loadimage(vigraidl_path() + "images/rect.gif"))
 
@@ -147,6 +153,8 @@ result_path = vigraidl_path() + "results/"
 IF FILE_TEST(result_path, /DIRECTORY) EQ 0 THEN FILE_MKDIR, result_path
 
 res = saveimage(img2, result_path + "lenna-relabeled-watersheds-on-resized-gradient-image.png")
+res = saveimage(img2_slic, result_path + "lenna-slic.png")
+res = saveimage(img2red_slic, result_path + "lenna-red-slic.png")
 
 res = saveimage( REAL_PART(img3),  result_path + "rect-fft-real.png")
 res = saveimage( IMAGINARY(img3) , result_path + "rect-fft-imag.png")
