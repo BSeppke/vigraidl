@@ -1,8 +1,8 @@
 ;###############################################################################
 ;###################            Generic convolution         ####################
 
-FUNCTION vigra_convolveimage_c, array, array2, kernelMat, width, height, kernel_width, kernel_height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_convolveimage_c', array, array2, DOUBLE(kernelMat), FIX(width), FIX(height), FIX(kernel_width), FIX(kernel_height), $
+FUNCTION vigra_convolveimage_c, array, kernelMat, array2, width, height, kernel_width, kernel_height
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_convolveimage_c', array, DOUBLE(kernelMat), array2, FIX(width), FIX(height), FIX(kernel_width), FIX(kernel_height), $
               VALUE=[0,0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -10,7 +10,7 @@ FUNCTION convolveimage_band, array, kernelMat
   shape = SIZE(array)
   kernel_shape = SIZE(kernelMat)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_convolveimage_c(array, array2, kernelMat, shape[1], shape[2], kernel_shape[1], kernel_shape[2])
+  err = vigra_convolveimage_c(array, kernelMat, array2, shape[1], shape[2], kernel_shape[1], kernel_shape[2])
   CASE err OF
     0: RETURN, array2
     1: MESSAGE, "Error in vigraidl.filters:convolveimage: Convolution with kernel failed!!"
@@ -30,8 +30,8 @@ END
 ;###############################################################################
 ;###################            Separable convolution         ####################
 
-FUNCTION vigra_separableconvolveimage_c, array, array2, kernel_x, kernel_y, width, height, kernel_x_size, kernel_y_size
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_separableconvolveimage_c', array, array2, DOUBLE(kernel_x), DOUBLE(kernel_y), FIX(width), FIX(height), FIX(kernel_x_size), FIX(kernel_y_size), $
+FUNCTION vigra_separableconvolveimage_c, array, kernel_x, kernel_y, array2, width, height, kernel_x_size, kernel_y_size
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_separableconvolveimage_c', array, DOUBLE(kernel_x), DOUBLE(kernel_y), array2, FIX(width), FIX(height), FIX(kernel_x_size), FIX(kernel_y_size), $
               VALUE=[0,0,0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -40,7 +40,7 @@ FUNCTION separableconvolveimage_band, array, kernel_x, kernel_y
   kernel_x_size = (SIZE(kernel_x))[2]
   kernel_y_size = (SIZE(kernel_y))[1]
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_separableconvolveimage_c(array, array2, kernel_x, kernel_y, shape[1], shape[2], kernel_x_size, kernel_y_size)
+  err = vigra_separableconvolveimage_c(array, kernel_x, kernel_y, array2, shape[1], shape[2], kernel_x_size, kernel_y_size)
   CASE err OF
     0: RETURN, array2
     1: MESSAGE, "Error in vigraidl.filters:separableconvolveimage: Convolution with kernel failed!!"
