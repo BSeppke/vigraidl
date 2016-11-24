@@ -13,6 +13,7 @@
 @impex
 @splineimageview
 @filters
+@tensors
 @imgproc
 @segmentation
 @morphology

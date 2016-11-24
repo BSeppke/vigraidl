@@ -55,15 +55,15 @@ END
 ;###############################################################################
 ;###################         Affine transform image         ####################
 
-FUNCTION vigra_affinewarpimage_c, array, array2, affineMat, width, height,  resize_mode
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_affinewarpimage_c', array, array2, DOUBLE(affineMat), FIX(width), FIX(height), FIX(resize_mode), $
+FUNCTION vigra_affinewarpimage_c, array, affineMat, array2, width, height,  resize_mode
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_affinewarpimage_c', array, DOUBLE(affineMat), array2, FIX(width), FIX(height), FIX(resize_mode), $
               VALUE=[0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
 FUNCTION affinewarpimage_band, array, affineMat, resize_mode
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_affinewarpimage_c(array, array2, affineMat, shape[1], shape[2], resize_mode)
+  err = vigra_affinewarpimage_c(array, affineMat, array2, shape[1], shape[2], resize_mode)
   CASE err OF
     0: RETURN, array2
     1: MESSAGE, "Error in vigraidl.imgproc:affinewarpimage: Affine transform of image failed!!"

@@ -1,4 +1,31 @@
 ;###############################################################################
+;###################          Distance Transform            ####################
+FUNCTION vigra_distancetransform_c, array, array2, width, height, background_label, norm
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_distancetransform_c', array, array2, FIX(width), FIX(height), FLOAT(background_label), FIX(norm), $
+              VALUE=[0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION distancetransform_band, array, background_label, norm
+  shape = SIZE(array)
+  array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_distancetransform_c(array, array2, shape[1], shape[2], background_label, norm)
+  CASE err OF
+    0:  RETURN, array2 
+    1:  MESSAGE, "Error in vigraidl.filters.distancetransform: Distance transformation failed!!"
+    2:  MESSAGE, "Error in vigraidl.filters.distancetransform: Norm must be in {0,1,2} !!"
+  ENDCASE
+END
+
+FUNCTION distancetransform, array, background_label, norm
+  shape = SIZE(array)
+  res_array =  array
+  FOR band = 0, shape[1]-1 DO BEGIN
+	res_array[band,*,*] = distancetransform_band(REFORM(array[band,*,*]), background_label, norm)
+  ENDFOR
+  RETURN, res_array
+END
+
+;###############################################################################
 ;###################         Erode image                   ####################
 FUNCTION vigra_discerosion_c, array, array2, width, height, radius
   RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_discerosion_c', array, array2, FIX(width), FIX(height), FIX(radius), $
@@ -76,15 +103,15 @@ END
 
 ;###############################################################################
 ;###################         Upwind image                   ####################
-FUNCTION vigraext_upwind_c, array, array2, width, height, radius
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigraext_upwind_c', array, array2, FIX(width), FIX(height), FLOAT(radius), $
+FUNCTION vigra_upwindimage_c, array, array2, width, height, radius
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_upwindimage_c', array, array2, FIX(width), FIX(height), FLOAT(radius), $
     VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
 FUNCTION upwindimage_band, array, radius
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigraext_upwind_c(array, array2, shape[1], shape[2], radius)
+  err = vigra_upwindimage_c(array, array2, shape[1], shape[2], radius)
   CASE err OF
     0: RETURN, array2
     1: MESSAGE, "Error in vigraidl.morphology:upwindimage: Upwinding of image failed!!"

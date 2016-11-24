@@ -1,14 +1,14 @@
 ;############ Getting Dimensions and # of Bands of an image-file    ############
-FUNCTION get_width_c, filename
-   RETURN, CALL_EXTERNAL(dylib_path() , 'get_width_c',filename,VALUE=[1],/CDECL, /AUTO_GLUE)
+FUNCTION vigra_imagewidth_c, filename
+   RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_imagewidth_c',filename,VALUE=[1],/CDECL, /AUTO_GLUE)
 END
 
-FUNCTION get_height_c, filename
-   RETURN, CALL_EXTERNAL(dylib_path() , 'get_height_c',filename,VALUE=[1],/CDECL, /AUTO_GLUE)
+FUNCTION vigra_imageheight_c, filename
+   RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_imageheight_c',filename,VALUE=[1],/CDECL, /AUTO_GLUE)
 END
 
-FUNCTION get_numbands_c, filename
-   RETURN, CALL_EXTERNAL(dylib_path() , 'get_numbands_c',filename,VALUE=[1],/CDECL, /AUTO_GLUE)
+FUNCTION vigra_imagenumbands_c, filename
+   RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_imagenumbands_c',filename,VALUE=[1],/CDECL, /AUTO_GLUE)
 END
 
 ;###############################################################################
@@ -19,8 +19,8 @@ FUNCTION vigra_importgrayimage_c, array, width, height, filename
 END
 
 FUNCTION loadgrayimage, filename
-	width  = get_width_c(filename)
-    	height = get_height_c(filename)
+	width  = vigra_imagewidth_c(filename)
+    	height = vigra_imageheight_c(filename)
 	IF  width EQ 0 OR height EQ 0 THEN BEGIN
 		MESSAGE, "Error in vigraidl.impex.loadgrayimage: Image not found"
 	ENDIF ELSE BEGIN
@@ -41,8 +41,8 @@ FUNCTION vigra_importrgbimage_c, array_r, array_g, array_b, width, height, filen
 END
 
 FUNCTION loadrgbimage, filename
-	width  = get_width_c(filename)
-    	height = get_height_c(filename)
+	width  = vigra_imagewidth_c(filename)
+    	height = vigra_imageheight_c(filename)
 	IF  width EQ 0 OR height EQ 0 THEN BEGIN
 		MESSAGE, "Error in vigraidl.impex.loadrgbimage: Image not found"
 	ENDIF ELSE BEGIN
@@ -66,7 +66,7 @@ FUNCTION loadrgbimage, filename
 END
 
 FUNCTION loadimage, filename
-	numbands = get_numbands_c(filename)
+	numbands = vigra_imagenumbands_c(filename)
 	CASE numbands OF
 		1: RETURN, loadgrayimage(filename)
 		3: RETURN, loadrgbimage(filename)
