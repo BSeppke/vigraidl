@@ -120,6 +120,8 @@ img14 = convolveimage( img, gauss_kernel)
 img15 = convolveimage( img, mean_kernel)
 img16 = separableconvolveimage( img, sep_x_kernel, sep_y_kernel)
 
+img17 = medianfilter( img, 3, 3)
+
 
 PRINT, "testing the spline image view"
 siv = create_splineimageview(img,2)
@@ -174,5 +176,6 @@ res = saveimage( img13,  result_path + "lenna-nonlineardiffusion-0.1-2.0.png")
 res = saveimage( img14,  result_path + "lenna-gauss-convolve.png")
 res = saveimage( img15,  result_path + "lenna-mean-convolve.png")
 res = saveimage( img16,  result_path + "lenna-sep-convolve.png")
+res = saveimage( img17,  result_path + "lenna-medianfilter-3x3.png")
 
 end

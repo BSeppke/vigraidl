@@ -242,6 +242,32 @@ FUNCTION sharpening, array, sharpening_factor
 END
 
 ;###############################################################################
+;###################            Median Filtering            ####################
+FUNCTION vigra_medianfilter_c, array, array2, width, height, window_width, window_height
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_medianfilter_c', array, array2, FIX(width), FIX(height), FIX(window_width), FIX(window_height), $
+              VALUE=[0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION medianfilter_band, array, window_width, window_height
+  shape = SIZE(array)
+  array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_medianfilter_c(array, array2, shape[1], shape[2],  window_width, window_height)
+  CASE err OF
+    0: RETURN, array2
+    1: MESSAGE, "Error in vigraidl.filters.medianfilter: Median filtering failed!"
+  ENDCASE
+END
+
+FUNCTION medianfilter, array, window_width, window_height
+  shape = SIZE(array)
+  res_array =  array
+  FOR band = 0, shape[1]-1 DO BEGIN
+	res_array[band,*,*] = medianfilter_band(REFORM(array[band,*,*]), window_width, window_height)
+  ENDFOR
+  RETURN, res_array
+END
+
+;###############################################################################
 ;###################          Nonlinear Diffusion           ####################
 FUNCTION vigra_nonlineardiffusion_c, array, array2, width, height, edge_threshold, scale
   RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_nonlineardiffusion_c', array, array2, FIX(width), FIX(height), FLOAT(edge_threshold), FLOAT(scale), $
