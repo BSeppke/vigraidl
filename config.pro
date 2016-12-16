@@ -1,7 +1,7 @@
 
 FUNCTION vigraidl_path
   CD, CURRENT=CDIR
-  RETURN, CDIR +"/"
+  IF !version.OS EQ 'Win32' THEN RETURN, CDIR+"\" ELSE RETURN, CDIR +"/"
 END
 
 FUNCTION vigraidl_version
@@ -13,7 +13,7 @@ FUNCTION idl_bits
 END
 
 FUNCTION dylib_file
-  IF !version.OS EQ 'windows' THEN  RETURN, 'vigra_c.dll' ELSE $
+  IF !version.OS EQ 'Win32' THEN  RETURN, 'vigra_c.dll' ELSE $
   IF !version.OS EQ 'darwin' THEN   RETURN, 'libvigra_c.dylib' ELSE $
   IF !version.OS EQ 'linux' THEN    RETURN, 'libvigra_c.so' ELSE MESSAGE, 'Error: Only macosx, windows and unix are supported'
 END
@@ -77,9 +77,9 @@ FUNCTION build_vigra_c
     ENDIF ELSE BEGIN
       MESSAGE, 'Vigra is not found. Please check if the prefix path is set correctly in ~/.profile environment file!'
     ENDELSE
-  ENDIF ELSE IF !version.OS_FAMILY EQ 'windows' THEN BEGIN
-    bindir = vigra_c_path() + 'bin/' + 'win' + idl_bits() + '/'
-    SPAWN, 'copy ' + bindir + '*.dll ' + vigraidl_path()
+  ENDIF ELSE IF !version.OS_FAMILY EQ 'Windows' THEN BEGIN
+    bindir = vigra_c_path() + 'bin\' + 'win' + idl_bits() + '\'
+    FILE_COPY, bindir + '*.dll', vigraidl_path(), /OVERWRITE
   ENDIF ELSE BEGIN
     MESSAGE, 'Only Mac OS X, Unix and Windows are supported for auto build of vigra_c!'
   ENDELSE
@@ -92,7 +92,8 @@ PRO CHECK_INSTALL
     result = build_vigra_c()
   ENDIF
   ;; For Windows: Add the dll directory to the systems path:
-  IF !version.OS_FAMILY EQ 'windows' THEN BEGIN
-    !PATH = !PATH + vigraidl_path()
+  IF !version.OS_FAMILY EQ 'Windows' THEN BEGIN
+    !MAKE_DLL.LD = 'link /out:%L /nologo /dll %O /def:%E "C:\\\\Program Files\\\\Exelis\\\\IDL84\\\\bin\\\\bin.x86_64\\\\idl.lib" msvcrt.lib legacy_stdio_definitions.lib %X'
+    !PATH = !PATH + ";" + vigraidl_path()
   ENDIF
 END

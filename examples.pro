@@ -12,10 +12,21 @@ PRINT, "loading lenna-image"
 img = loadimage(vigraidl_path() + "images/lenna_face.png")
 shape = SIZE(img)
 
-img_padd = paddimage(img, 10, 20, 30, 40)
+PRINT, "testing image padding"
+; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
+IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
+  img_padd = paddimage(img, 10, 20, 30, 40)
+ENDIF ELSE BEGIN
+  img_padd = MAKE_ARRAY(shape[1],shape[2]+40,shape[3]+60, /FLOAT, VALUE=0.0)
+  img_padd[*,10:10+shape[2]-1,20:20+shape[3]-1] = img
+ENDELSE
 
 PRINT, "testing subimage and correlation facilities"
-img_cut = subimage(img, 100, 50, 151, 101) ;;Mask needs to have odd size!
+IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
+  img_cut = subimage(img, 100, 50, 151, 101) ;;Mask needs to have odd size! Here 51x51
+ENDIF ELSE BEGIN
+  img_cut = img[*,100:150,100:150] ;;Mask needs to have odd size! Here 51x51
+ENDELSE
 
 fcc_res = fastcrosscorrelation(img, img_cut)
 fncc_res = fastnormalizedcrosscorrelation(img, img_cut)
@@ -33,8 +44,11 @@ img2 = regionimagetocrackedgeimage( $
                       1.0))), $
                 0.0)
 
-PRINT, "performing slic segmentation on lenna image"
-img2_slic = regionimagetocrackedgeimage( slic(img), 0.0)
+; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
+IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
+  PRINT, "performing slic segmentation on lenna image"
+  img2_slic = regionimagetocrackedgeimage( slic(img), 0.0)
+ENDIF
 
 PRINT, "performing slic segmentation on the red channel of the lenna image"
 img2red_slic = regionimagetocrackedgeimage( slic(img[0,*,*]), 0.0)
@@ -89,14 +103,17 @@ img_bt = boundarytensor(img, 1.0)
 ; boundary tensor without 0 order parts
 img_bt = boundarytensor1(img, 1.0)
 
-;;tensor to eigen repr.
-img_st_te  = tensoreigenrepresentation(img_st)
-
 ;tensor trace
 img_st_tt = tensortrace(img_st)
 
-;tensor to edge corner
-img_st_ec = tensortoedgecorner(img_st)
+; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
+IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
+  ;;tensor to eigen repr.
+  img_st_te  = tensoreigenrepresentation(img_st)
+  
+  ;tensor to edge corner
+  img_st_ec = tensortoedgecorner(img_st)
+ENDIF
 
 ;tensor to hourglass-filtered tensor
 img_st_hg = hourglassfilter(img_st, 1.0, 1.0)
@@ -118,7 +135,11 @@ sep_y_kernel =  [ [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] ]/9.0
 
 img14 = convolveimage( img, gauss_kernel)
 img15 = convolveimage( img, mean_kernel)
-img16 = separableconvolveimage( img, sep_x_kernel, sep_y_kernel)
+
+; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
+IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
+  img16 = separableconvolveimage( img, sep_x_kernel, sep_y_kernel)
+ENDIF
 
 img17 = medianfilter( img, 3, 3)
 
@@ -155,7 +176,6 @@ result_path = vigraidl_path() + "results/"
 IF FILE_TEST(result_path, /DIRECTORY) EQ 0 THEN FILE_MKDIR, result_path
 
 res = saveimage(img2, result_path + "lenna-relabeled-watersheds-on-resized-gradient-image.png")
-res = saveimage(img2_slic, result_path + "lenna-slic.png")
 res = saveimage(img2red_slic, result_path + "lenna-red-slic.png")
 
 res = saveimage( REAL_PART(img3),  result_path + "rect-fft-real.png")
@@ -175,7 +195,12 @@ res = saveimage( img12,  result_path + "lenna-sharpening-3.0.png")
 res = saveimage( img13,  result_path + "lenna-nonlineardiffusion-0.1-2.0.png")
 res = saveimage( img14,  result_path + "lenna-gauss-convolve.png")
 res = saveimage( img15,  result_path + "lenna-mean-convolve.png")
-res = saveimage( img16,  result_path + "lenna-sep-convolve.png")
 res = saveimage( img17,  result_path + "lenna-medianfilter-3x3.png")
+
+;Non-created images, due to Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
+IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
+  res = saveimage(img2_slic, result_path + "lenna-slic.png")
+  res = saveimage( img16,  result_path + "lenna-sep-convolve.png")
+ENDIF
 
 end
