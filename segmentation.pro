@@ -1,14 +1,15 @@
 ;###############################################################################
 ;###################         Label image                    ####################
-FUNCTION vigra_labelimage_c, array, array2, width, height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_labelimage_c', array, array2, FIX(width), FIX(height),  $
-              VALUE=[0,0,1,1],/CDECL, /AUTO_GLUE)
+FUNCTION vigra_labelimage_c, array, array2, width, height, eight_connectivity
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_labelimage_c', array, array2, FIX(width), FIX(height), BOOLEAN(eight_connectivity), $
+              VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
-FUNCTION labelimage_band, array
+FUNCTION labelimage_band, array, eight_connectivity
+  IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_labelimage_c(array, array2, shape[1], shape[2])
+  err = vigra_labelimage_c(array, array2, shape[1], shape[2], eight_connectivity)
   IF err EQ -1 THEN BEGIN
     MESSAGE, "Error in vigraidl.segmentation.labelimage: Labeling of image failed!"
   ENDIF ELSE BEGIN
@@ -16,38 +17,86 @@ FUNCTION labelimage_band, array
   ENDELSE
 END
 	  
-FUNCTION labelimage, array
+FUNCTION labelimage, array, eight_connectivity
+  IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
   shape = SIZE(array)
   res_array =  array
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = labelimage_band(REFORM(array[band,*,*]))
+	res_array[band,*,*] = labelimage_band(REFORM(array[band,*,*]), eight_connectivity)
   ENDFOR
   RETURN, res_array
 END
-	  
+    
 ;###############################################################################
 ;###################      Watershed Transform (Union-Find)  ####################
-FUNCTION vigra_watersheds_c, array, array2, width, height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_watersheds_c', array, array2, FIX(width), FIX(height),  $
-              VALUE=[0,0,1,1],/CDECL, /AUTO_GLUE)
+FUNCTION vigra_watershedsunionfind_c, array, array2, width, height, eight_connectivity
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_watershedsunionfind_c', array, array2, FIX(width), FIX(height), BOOLEAN(eight_connectivity),  $
+              VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
-FUNCTION watersheds_band, array
+FUNCTION watersheds_uf_band, array, eight_connectivity
+  IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_watersheds_c(array, array2, shape[1], shape[2])
+  err = vigra_watershedsunionfind_c(array, array2, shape[1], shape[2], eight_connectivity)
   IF err EQ -1 THEN BEGIN
-    MESSAGE, "Error in vigraidl.segmentation.watersheds: Watershed Transform of image failed!"
+    MESSAGE, "Error in vigraidl.segmentation.watersheds_uf: Watershed Transform of image failed!"
   ENDIF ELSE BEGIN
     RETURN, array2
   ENDELSE
 END
-	  
-FUNCTION watersheds, array
+    
+FUNCTION watersheds_uf, array, eight_connectivity
+  IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
   shape = SIZE(array)
   res_array =  array
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = watersheds_band(REFORM(array[band,*,*]))
+  res_array[band,*,*] = watersheds_uf_band(REFORM(array[band,*,*]), eight_connectivity)
+  ENDFOR
+  RETURN, res_array
+END
+
+
+;###############################################################################
+;###################  Watershed Transform (Region-growing)  ####################
+FUNCTION vigra_watershedsregiongrowing_c, array, array2, width, height, eight_connectivity, keep_contours, use_turbo, stop_cost
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_watershedsregiongrowing_c', array, array2, FIX(width), FIX(height),  $
+    BOOLEAN(eight_connectivity), BOOLEAN(keep_contours), BOOLEAN(use_turbo), DOUBLE(stop_cost), $
+    VALUE=[0,0,1,1,1,1,1,1], /CDECL, /AUTO_GLUE)
+END
+
+FUNCTION watersheds_rg_band, array, seeds, eight_connectivity , keep_contours, use_turbo, stop_cost
+  IF N_ELEMENTS(seeds) EQ 0 THEN BEGIN
+    seeds = labelimage_band(localminima_band(array)) - 1
+  ENDIF
+  IF N_ELEMENTS(eight_connectivity) EQ 0 THEN eight_connectivity = 1
+  IF N_ELEMENTS(keep_contours) EQ 0 THEN keep_contours = 0
+  IF N_ELEMENTS(use_turbo) EQ 0 THEN use_turbo = 0
+  IF N_ELEMENTS(stop_cost) EQ 0 THEN stop_cost = -1.0
+ 
+  shape = SIZE(array)
+  array2 = seeds
+  err = vigra_watershedsregiongrowing_c(array, array2, shape[1], shape[2], eight_connectivity, keep_contours, use_turbo, stop_cost)
+  IF err EQ -1 THEN BEGIN
+    MESSAGE, "Error in vigraidl.segmentation.watersheds_rg: Watershed Transform of image failed!"
+  ENDIF ELSE BEGIN
+    RETURN, array2
+  ENDELSE
+END
+
+FUNCTION watersheds_rg, array, seeds, eight_connectivity , keep_contours, use_turbo, stop_cost
+  IF N_ELEMENTS(seeds) EQ 0 THEN BEGIN
+    seeds = labelimage(localminima(array)) - 1
+  ENDIF
+  IF N_ELEMENTS(eight_connectivity) EQ 0 THEN eight_connectivity = 1
+  IF N_ELEMENTS(keep_contours) EQ 0 THEN keep_contours = 0
+  IF N_ELEMENTS(use_turbo) EQ 0 THEN use_turbo = 0
+  IF N_ELEMENTS(stop_cost) EQ 0 THEN stop_cost = -1.0
+  
+  shape = SIZE(array)
+  res_array =  array
+  FOR band = 0, shape[1]-1 DO BEGIN
+    res_array[band,*,*] = watersheds_rg_band(REFORM(array[band,*,*]), REFORM(seeds[band,*,*]), eight_connectivity, keep_contours, use_turbo, stop_cost)
   ENDFOR
   RETURN, res_array
 END

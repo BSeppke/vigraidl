@@ -190,52 +190,56 @@ END
 
 ;###############################################################################
 ;###################        Local maxima extraction         ####################
-FUNCTION vigra_localmaxima_c, array, array2, width, height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localmaxima_c', array, array2, FIX(width), FIX(height),  $
-              VALUE=[0,0,1,1],/CDECL, /AUTO_GLUE)
+FUNCTION vigra_localmaxima_c, array, array2, width, height, eight_connectivity
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localmaxima_c', array, array2, FIX(width), FIX(height), BOOLEAN(eight_connectivity), $
+              VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
-FUNCTION localmaxima_band, array
+FUNCTION localmaxima_band, array, eight_connectivity
+  IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_localmaxima_c(array, array2, shape[1], shape[2])
+  err = vigra_localmaxima_c(array, array2, shape[1], shape[2], eight_connectivity)
   CASE err OF
     0: RETURN, array2
     1: MESSAGE, "Error in vigraidl.imgproc:localmaxima: Extraction of local maxima of the image failed!!"
   ENDCASE
 END
 
-FUNCTION localmaxima, array
+FUNCTION localmaxima, array, eight_connectivity
+  IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
   shape = SIZE(array)
   res_array =  array
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = localmaxima_band(REFORM(array[band,*,*]))
+	res_array[band,*,*] = localmaxima_band(REFORM(array[band,*,*]), eight_connectivity)
   ENDFOR
   RETURN, res_array
 END	  
 
 ;###############################################################################
 ;###################        Local minima extraction         ####################
-FUNCTION vigra_localminima_c, array, array2, width, height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localminima_c', array, array2, FIX(width), FIX(height),  $
-              VALUE=[0,0,1,1],/CDECL, /AUTO_GLUE)
+FUNCTION vigra_localminima_c, array, array2, width, height, eight_connectivity
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localminima_c', array, array2, FIX(width), FIX(height), BOOLEAN(eight_connectivity),  $
+              VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
-FUNCTION localminima_band, array
+FUNCTION localminima_band, array, eight_connectivity
+  IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_localminima_c(array, array2, shape[1], shape[2])
+  err = vigra_localminima_c(array, array2, shape[1], shape[2], eight_connectivity)
   CASE err OF
     0: RETURN, array2
     1: MESSAGE, "Error in vigraidl.imgproc:localminima: Extraction of local minima of the image failed!!"
   ENDCASE
 END
 
-FUNCTION localminima, array
+FUNCTION localminima, array, eight_connectivity
+  IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
   shape = SIZE(array)
   res_array =  array
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = localminima_band(REFORM(array[band,*,*]))
+	res_array[band,*,*] = localminima_band(REFORM(array[band,*,*]), eight_connectivity)
   ENDFOR
   RETURN, res_array
 END	  

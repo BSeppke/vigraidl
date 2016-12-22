@@ -36,13 +36,20 @@ neg_matches = localminima(fncc_res)
 
 
 PRINT, "performing watershed transform on resized gradient image"
-img2 = regionimagetocrackedgeimage( $
+img2a = regionimagetocrackedgeimage( $
           labelimage( $
-              watersheds( $
+              watersheds_uf( $
                   ggradient( $
                       resizeimage(img, 2*shape[2], 2*shape[3],  4), $
                       1.0))), $
-                0.0)
+                0.0)  
+img2b = regionimagetocrackedgeimage( $
+                      labelimage( $
+                        watersheds_rg( $
+                          ggradient( $
+                            resizeimage(img, 2*shape[2], 2*shape[3],  4), $
+                            1.0))), $
+                       0.0)
 
 ; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
 IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
@@ -175,7 +182,8 @@ result_path = vigraidl_path() + "results/"
 
 IF FILE_TEST(result_path, /DIRECTORY) EQ 0 THEN FILE_MKDIR, result_path
 
-res = saveimage(img2, result_path + "lenna-relabeled-watersheds-on-resized-gradient-image.png")
+res = saveimage(img2a, result_path + "lenna-relabeled-watersheds-uf-on-resized-gradient-image.png")
+res = saveimage(img2b, result_path + "lenna-relabeled-watersheds-rg-on-resized-gradient-image.png")
 res = saveimage(img2red_slic, result_path + "lenna-red-slic.png")
 
 res = saveimage( REAL_PART(img3),  result_path + "rect-fft-real.png")
