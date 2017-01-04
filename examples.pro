@@ -60,6 +60,38 @@ ENDIF
 PRINT, "performing slic segmentation on the red channel of the lenna image"
 img2red_slic = regionimagetocrackedgeimage( slic(img[0,*,*]), 0.0)
 
+PRINT, ""
+PRINT, "extracting slic (RGB) segmentation stats for the red channel seg. of the lenna image"
+img2_slic_stats = extractfeatures(img, slic(img[0,*,*]))
+
+stats_shape = SIZE(img2_slic_stats)
+
+FOR i=0, stats_shape[3]-1 DO BEGIN
+  PRINT, "Region", i, ":    Size: ", img2_slic_stats[0,0,i],"    Mean Color: (", img2_slic_stats[0,13,i], ",", img2_slic_stats[0,14,i], ",", img2_slic_stats[0,15,i], ")"
+ENDFOR
+
+PRINT, ""
+PRINT, "extracting slic (single-band) segmentation stats for the red channel seg. of the lenna image"
+img2red_slic_stats = extractfeatures(img[0,*,*], slic(img[0,*,*]))
+
+stats_shape = SIZE(img2red_slic_stats)
+
+FOR i=0, stats_shape[3]-1 DO BEGIN
+  PRINT, "Region", i, ":    Size: ", img2red_slic_stats[0,0,i],"    Mean Color: ", img2red_slic_stats[0,9,i]
+ENDFOR
+
+PRINT, ""
+PRINT, "extracting WT segmentation stats for the lenna image"
+img2wt_stats = extractfeatures(img, watersheds_rg(ggradient(img, 5.0)))
+
+stats_shape = SIZE(img2wt_stats)
+
+FOR c=0, stats_shape[1]-1 DO BEGIN
+  FOR i=0, stats_shape[3]-1 DO BEGIN
+    PRINT, "Band: ", c, "    Region:", i, "    Size: ", img2wt_stats[c,0,i],"    Mean Color: ", img2wt_stats[c,9,i]
+  endfor
+ENDFOR
+
 PRINT, "performing fft on image"
 img3 = fouriertransform(loadimage(vigraidl_path() + "images/rect.gif"))
 

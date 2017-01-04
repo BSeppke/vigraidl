@@ -5,11 +5,22 @@ FUNCTION vigra_labelimage_c, array, array2, width, height, eight_connectivity
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
-FUNCTION labelimage_band, array, eight_connectivity
+FUNCTION vigra_labelimagewithbackground_c, array, array2, width, height, eight_connectivity, background
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_labelimagewithbackground_c', array, array2, FIX(width), FIX(height), BOOLEAN(eight_connectivity), FLOAT(background), $
+    VALUE=[0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION labelimage_band, array, eight_connectivity, background
   IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_labelimage_c(array, array2, shape[1], shape[2], eight_connectivity)
+  
+  IF N_Elements(background) EQ 0 THEN BEGIN
+    err = vigra_labelimage_c(array, array2, shape[1], shape[2], eight_connectivity)
+  ENDIF ELSE BEGIN
+    err = vigra_labelimagewithbackground_c(array, array2, shape[1], shape[2], eight_connectivity, background)  
+  ENDELSE
+  
   IF err EQ -1 THEN BEGIN
     MESSAGE, "Error in vigraidl.segmentation.labelimage: Labeling of image failed!"
   ENDIF ELSE BEGIN
@@ -17,12 +28,12 @@ FUNCTION labelimage_band, array, eight_connectivity
   ENDELSE
 END
 	  
-FUNCTION labelimage, array, eight_connectivity
+FUNCTION labelimage, array, eight_connectivity, background
   IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
   shape = SIZE(array)
   res_array =  array
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = labelimage_band(REFORM(array[band,*,*]), eight_connectivity)
+	res_array[band,*,*] = labelimage_band(REFORM(array[band,*,*]), eight_connectivity, background)
   ENDFOR
   RETURN, res_array
 END
@@ -237,6 +248,67 @@ FUNCTION regionimagetocrackedgeimage, array, mark
   FOR band = 0, shape[1]-1 DO BEGIN
 	res_array[band,*,*] = regionimagetocrackedgeimage_band(REFORM(array[band,*,*]), mark)
   ENDFOR
+  RETURN, res_array
+END
+
+
+;###############################################################################
+;###################     REGION-WISE FEATURE EXTRACTION     ####################
+FUNCTION vigra_extractfeatures_gray_c, array, array2, array3, width, height, max_label
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_extractfeatures_gray_c', array, array2, array3, FIX(width), FIX(height), FIX(max_label), $
+    VALUE=[0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION extractfeatures_band, array, label_array, max_label
+
+  IF N_ELEMENTS(max_label) EQ 0 THEN max_label=max(max(label_array))
+  
+  shape = SIZE(array)
+  array3 = MAKE_ARRAY(11, max_label+1, /FLOAT, VALUE = 0.0)
+  err = vigra_extractfeatures_gray_c(array, label_array, array3, shape[1], shape[2], max_label)
+  IF err EQ 1 THEN BEGIN
+    MESSAGE, "Error in vigraidl.segmentation.extractfeatures_band: Region-wise feature eaxtraction of image failed!"
+  ENDIF ELSE BEGIN
+    RETURN, array3
+  ENDELSE
+END
+
+FUNCTION vigra_extractfeatures_rgb_c, array_r, array_g, array_b, array2, array3, width, height, max_label
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_extractfeatures_rgb_c', array_r, array_g, array_b, array2, array3, FIX(width), FIX(height), FIX(max_label), $
+    VALUE=[0,0,0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION extractfeatures_rgb, array_r, array_g, array_b, label_array, max_label
+  
+  IF N_ELEMENTS(max_label) EQ 0 THEN max_label=max(max(label_array))
+  
+  shape = SIZE(array_r)
+  array3 = MAKE_ARRAY(1,19, max_label+1, /FLOAT, VALUE = 0.0)
+  err = vigra_extractfeatures_rgb_c(array_r, array_g, array_b, label_array, array3, shape[1], shape[2], max_label)
+  IF err EQ 1 THEN BEGIN
+    MESSAGE, "Error in vigraidl.segmentation.extractfeatures_rgb: Region-wise feature eaxtraction of image failed!"
+  ENDIF ELSE BEGIN
+    RETURN, array3
+  ENDELSE
+END
+
+FUNCTION extractfeatures, array, label_array, max_label
+
+  IF N_ELEMENTS(max_label) EQ 0 THEN max_label=max(max(max(label_array)))
+  
+  shape = SIZE(array)
+  label_shape = SIZE(label_array)
+
+  IF shape[0] EQ 3 AND shape[1] EQ 3 AND label_shape[0] EQ 3 AND Label_shape[1] EQ 1 THEN BEGIN
+    res_array = extractfeatures_rgb(REFORM(array[0,*,*]), REFORM(array[1,*,*]), REFORM(array[2,*,*]), REFORM(label_array[0,*,*]), max_label)
+  ENDIF ELSE BEGIN
+    res_array =  MAKE_ARRAY(shape[1], 11, max_label+1, /FLOAT, VALUE = 0.0)
+    FOR band = 0, shape[1]-1 DO BEGIN
+      label_band = REFORM(label_array[band,*,*])
+      label_band_max = max(max(label_band))
+      res_array[band,*,0:label_band_max] = extractfeatures_band(REFORM(array[band,*,*]), label_band, label_band_max)
+    ENDFOR
+  ENDELSE
   RETURN, res_array
 END
 	  
