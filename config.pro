@@ -1,4 +1,3 @@
-
 FUNCTION vigraidl_path
   CD, CURRENT=CDIR
   IF !version.OS EQ 'Win32' THEN RETURN, CDIR+"\" ELSE RETURN, CDIR +"/"
@@ -26,30 +25,19 @@ FUNCTION cmake_flags
   IF idl_bits() EQ 32 THEN   RETURN, '-DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_C_FLAGS=-m32'  ELSE RETURN, '-DCMAKE_BUILD_TYPE=Release'
 END
 
-FUNCTION base_login_script
-  RETURN, '~/.profile'
-END
-
 FUNCTION vigra_c_path 
   RETURN, vigraidl_path() +'vigra_c/'
 END
 
-FUNCTION login_script
-  IF FILE_TEST(base_login_script()) THEN RETURN, base_login_script() ELSE RETURN, vigra_c_path() + 'fallback.profile'
-END
-
-FUNCTION login_cmd
-  RETURN, 'source ' + login_script()
-END
-
-FUNCTION system_env, arg
- SPAWN, login_cmd() + ' && ' + arg
+FUNCTION system_call, arg
+  SPAWN, arg, EXIT_STATUS=stat
+  RETURN, stat ;;Attention: Zero on success!
 END
 
 FUNCTION vigra_version
- SPAWN, login_cmd() + ' && vigra-config --version', version_string
- PRINT, version_string
- RETURN, STRSPLIT(version_string, '.', /EXTRACT)
+  SPAWN, 'vigra-config --version', version_string
+  PRINT, version_string
+  RETURN, STRSPLIT(version_string, '.', /EXTRACT)
 END
 
 FUNCTION vigra_installed
@@ -67,9 +55,13 @@ END
 ; The compilation routine (at least for macosx and unix)
 FUNCTION build_vigra_c
   IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
+    ; Add MacPorts path for Mac OS X, if not already there
+    IF !version.OS EQ 'darwin' AND STRPOS(GETENV('PATH'), '/opt/local/bin:') EQ -1 THEN BEGIN
+      SETENV, 'PATH=/opt/local/bin:' + GETENV('PATH')
+    ENDIF
     IF vigra_installed() THEN BEGIN
       PRINT, '-------------- BUILDING VIGRA-C-WRAPPER FOR COMPUTER VISION AND IMAGE PROCESSING TASKS --------------'
-      IF system_env('cd ' + vigra_c_path() + ' && mkdir -p build && cd build && cmake ' + cmake_flags() + ' .. && make && cd .. && rm -rf ./build') EQ 0 THEN BEGIN
+      IF system_call('cd ' + vigra_c_path() + ' && mkdir -p build && cd build && cmake ' + cmake_flags() + ' .. && make && cd .. && rm -rf ./build') EQ 0 THEN BEGIN
         FILE_COPY, vigra_c_path() + 'bin/' + dylib_file(), dylib_path(), /OVERWRITE
       ENDIF ELSE BEGIN 
         MESSAGE, 'making the vigra_c lib failed, although vigra seems to be installed'
