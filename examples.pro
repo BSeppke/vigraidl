@@ -60,15 +60,17 @@ ENDIF
 PRINT, "performing slic segmentation on the red channel of the lenna image"
 img2red_slic = regionimagetocrackedgeimage( slic(img[0,*,*]), 0.0)
 
-PRINT, ""
-PRINT, "extracting slic (RGB) segmentation stats for the red channel seg. of the lenna image"
-img2_slic_stats = extractfeatures(img, slic(img[0,*,*]))
+IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
+  PRINT, ""
+  PRINT, "extracting slic (RGB) segmentation stats for the red channel seg. of the lenna image"
+  img2_slic_stats = extractfeatures(img, slic(img[0,*,*]))
 
-stats_shape = SIZE(img2_slic_stats)
+  stats_shape = SIZE(img2_slic_stats)
 
-FOR i=0, stats_shape[3]-1 DO BEGIN
-  PRINT, "Region", i, ":    Size: ", img2_slic_stats[0,0,i],"    Mean Color: (", img2_slic_stats[0,13,i], ",", img2_slic_stats[0,14,i], ",", img2_slic_stats[0,15,i], ")"
-ENDFOR
+  FOR i=0, stats_shape[3]-1 DO BEGIN
+    PRINT, "Region", i, ":    Size: ", img2_slic_stats[0,0,i],"    Mean Color: (", img2_slic_stats[0,13,i], ",", img2_slic_stats[0,14,i], ",", img2_slic_stats[0,15,i], ")"
+  ENDFOR
+ENDIF
 
 PRINT, ""
 PRINT, "extracting slic (single-band) segmentation stats for the red channel seg. of the lenna image"
