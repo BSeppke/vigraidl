@@ -96,6 +96,7 @@ ENDFOR
 
 PRINT, "performing fft on image"
 img3 = fouriertransform(loadimage(vigraidl_path() + "images/rect.gif"))
+img3ifft = fouriertransforminverse(img3)
 
 PRINT, "testing rotation and reflection functions on image"
 img4 = reflectimage( img, 3)
@@ -224,6 +225,8 @@ res = saveimage( REAL_PART(img3),  result_path + "rect-fft-real.png")
 res = saveimage( IMAGINARY(img3) , result_path + "rect-fft-imag.png")
 res = saveimage( ABS(img3) ,       result_path + "rect-fft-magnitude.png")
 res = saveimage( SQRT(ABS(img3)) , result_path + "rect-fft-sqrt-magnitude.png")
+res = saveimage( REAL_PART(img3ifft),  result_path + "rect-fft-ifft-real.png")
+res = saveimage( IMAGINARY(img3ifft) , result_path + "rect-fft-ifft-imag.png")
 
 res = saveimage( img4 ,  result_path + "lenna-reflected-both.png")
 res = saveimage( img5 ,  result_path + "lenna-rotated-15deg.png")

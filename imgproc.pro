@@ -121,7 +121,7 @@ FUNCTION fouriertransform_band, array
   err = vigra_fouriertransform_c(array, array2, array3, shape[1], shape[2])
   CASE err OF
     0: RETURN, COMPLEX(array2, array3)
-    1: MESSAGE, "Error in vigraidl.imgproc:fouriertransform: FastFourier Transform of image failed!!"
+    1: MESSAGE, "Error in vigraidl.imgproc:fouriertransform: Fast Fourier Transform of image failed!!"
   ENDCASE
 END
 
@@ -129,7 +129,37 @@ FUNCTION fouriertransform, array
   shape = SIZE(array)
   res_array =  MAKE_ARRAY(shape[1], shape[2], shape[3], /COMPLEX, VALUE = 0.0)
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = fouriertransform_band(REFORM(array[band,*,*]))
+  res_array[band,*,*] = fouriertransform_band(REFORM(array[band,*,*]))
+  ENDFOR
+  RETURN, res_array
+END
+
+
+;###############################################################################
+;###################     Inverse Fast Fourier Transform     ####################
+FUNCTION vigra_fouriertransforminverse_c, array, array2, array3, array4, width, height
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fouriertransforminverse_c', array, array2, array3, array4, FIX(width), FIX(height),  $
+    VALUE=[0,0,0,0,1,1],/CDECL, /AUTO_GLUE)
+END
+
+FUNCTION fouriertransforminverse_band, array
+  shape = SIZE(array)
+  real_arr = REAL_PART(array)
+  imag_arr = IMAGINARY(array)
+  array3 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  array4 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_fouriertransforminverse_c(real_arr, imag_arr, array3, array4, shape[1], shape[2])
+  CASE err OF
+    0: RETURN, COMPLEX(array3, array4)
+    1: MESSAGE, "Error in vigraidl.imgproc:fouriertransforminverse: Inverse Fast Fourier Transform of image failed!!"
+  ENDCASE
+END
+
+FUNCTION fouriertransforminverse, array
+  shape = SIZE(array)
+  res_array =  MAKE_ARRAY(shape[1], shape[2], shape[3], /COMPLEX, VALUE = 0.0)
+  FOR band = 0, shape[1]-1 DO BEGIN
+    res_array[band,*,*] = fouriertransforminverse_band(REFORM(array[band,*,*]))
   ENDFOR
   RETURN, res_array
 END
