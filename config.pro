@@ -85,7 +85,7 @@ PRO CHECK_INSTALL
   ENDIF
   ;; For Windows: Add the dll directory to the systems path:
   IF !version.OS_FAMILY EQ 'Windows' THEN BEGIN
-    !MAKE_DLL.LD = 'link /out:%L /nologo /dll %O /def:%E "C:\\\\Program Files\\\\Exelis\\\\IDL84\\\\bin\\\\bin.x86_64\\\\idl.lib" msvcrt.lib legacy_stdio_definitions.lib %X'
+    !MAKE_DLL.LD = 'link /out:%L /nologo /dll %O /def:%E "' + !DLM_PATH + '\\idl.lib" msvcrt.lib legacy_stdio_definitions.lib %X'
     !PATH = !PATH + ";" + vigraidl_path()
   ENDIF
 END
