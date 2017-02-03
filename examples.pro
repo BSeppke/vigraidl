@@ -95,7 +95,8 @@ FOR c=0, stats_shape[1]-1 DO BEGIN
 ENDFOR
 
 PRINT, "performing fft on image"
-img3 = fouriertransform(loadimage(vigraidl_path() + "images/rect.gif"))
+img_rect = loadimage(vigraidl_path() + "images/rect.png")
+img3 = fouriertransform(img_rect[3,*,*]) ;Only use alpha channel
 img3ifft = fouriertransforminverse(img3)
 
 PRINT, "testing rotation and reflection functions on image"

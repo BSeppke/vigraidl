@@ -82,7 +82,7 @@ FUNCTION loadrgbaimage, filename
     array_a = MAKE_ARRAY(width, height, /FLOAT, VALUE = 0.0)
 
     err = vigra_importrgbaimage_c(array_r, array_g, array_b, array_a, width, height, filename)
-    array = MAKE_ARRAY(3, width, height, /FLOAT, VALUE = 0.0)
+    array = MAKE_ARRAY(4, width, height, /FLOAT, VALUE = 0.0)
     array[0,*,*] = array_r
     array[1,*,*] = array_g
     array[2,*,*] = array_b
