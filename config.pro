@@ -78,11 +78,19 @@ FUNCTION build_vigra_c
   RETURN, 1
 END
 
-PRO CHECK_INSTALL
-  ;;Enable Auto-Build of the vigra-c-lib if not already present!
-  IF FILE_TEST(dylib_path()) EQ 0 THEN BEGIN
+PRO CHECK_INSTALL   
+  ;;Install error handler
+  CATCH, Error_status
+  
+  IF Error_status NE 0 THEN BEGIN
     result = build_vigra_c()
+    CATCH, /CANCEL
   ENDIF
+  
+  ;;Enable Auto-Build if the lib cannot be loaded:
+  test = CALL_EXTERNAL(dylib_path() , 'vigra_imagewidth_c', "foo.png",VALUE=[1], /CDECL, /AUTO_GLUE)
+
+  
   ;; For Windows: Add the dll directory to the systems path:
   IF !version.OS_FAMILY EQ 'Windows' THEN BEGIN
     !MAKE_DLL.LD = 'link /out:%L /nologo /dll %O /def:%E "' + !DLM_PATH + '\\idl.lib" msvcrt.lib legacy_stdio_definitions.lib %X'
