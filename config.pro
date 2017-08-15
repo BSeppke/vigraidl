@@ -21,10 +21,6 @@ FUNCTION dylib_path
   RETURN, vigraidl_path() + dylib_file()
 END
 
-FUNCTION cmake_flags
-  IF idl_bits() EQ 32 THEN   RETURN, '-DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_C_FLAGS=-m32'  ELSE RETURN, '-DCMAKE_BUILD_TYPE=Release'
-END
-
 FUNCTION vigra_c_path 
   RETURN, vigraidl_path() +'vigra_c/'
 END
@@ -61,7 +57,7 @@ FUNCTION build_vigra_c
     ENDIF
     IF vigra_installed() THEN BEGIN
       PRINT, '-------------- BUILDING VIGRA-C-WRAPPER FOR COMPUTER VISION AND IMAGE PROCESSING TASKS --------------'
-      IF system_call('cd ' + vigra_c_path() + ' && mkdir -p build && cd build && cmake ' + cmake_flags() + ' .. && make && cd .. && rm -rf ./build') EQ 0 THEN BEGIN
+      IF system_call('cd ' + vigra_c_path() + ' && ./build-' + idl_bits() + '.sh') EQ 0 THEN BEGIN
         FILE_COPY, vigra_c_path() + 'bin/' + dylib_file(), dylib_path(), /OVERWRITE
       ENDIF ELSE BEGIN 
         MESSAGE, 'making the vigra_c lib failed, although vigra seems to be installed'

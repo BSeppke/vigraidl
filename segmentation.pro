@@ -264,7 +264,7 @@ FUNCTION extractfeatures_band, array, label_array, max_label
   IF N_ELEMENTS(max_label) EQ 0 THEN max_label=max(max(label_array))
   
   shape = SIZE(array)
-  array3 = MAKE_ARRAY(11, max_label+1, /FLOAT, VALUE = 0.0)
+  array3 = MAKE_ARRAY(17, max_label+1, /FLOAT, VALUE = 0.0)
   err = vigra_extractfeatures_gray_c(array, label_array, array3, shape[1], shape[2], max_label)
   IF err EQ 1 THEN BEGIN
     MESSAGE, "Error in vigraidl.segmentation.extractfeatures_band: Region-wise feature eaxtraction of image failed!"
@@ -283,7 +283,7 @@ FUNCTION extractfeatures_rgb, array_r, array_g, array_b, label_array, max_label
   IF N_ELEMENTS(max_label) EQ 0 THEN max_label=max(max(label_array))
   
   shape = SIZE(array_r)
-  array3 = MAKE_ARRAY(1,19, max_label+1, /FLOAT, VALUE = 0.0)
+  array3 = MAKE_ARRAY(1,25, max_label+1, /FLOAT, VALUE = 0.0)
   err = vigra_extractfeatures_rgb_c(array_r, array_g, array_b, label_array, array3, shape[1], shape[2], max_label)
   IF err EQ 1 THEN BEGIN
     MESSAGE, "Error in vigraidl.segmentation.extractfeatures_rgb: Region-wise feature eaxtraction of image failed!"
@@ -302,7 +302,7 @@ FUNCTION extractfeatures, array, label_array, max_label
   IF shape[0] EQ 3 AND shape[1] EQ 3 AND label_shape[0] EQ 3 AND Label_shape[1] EQ 1 THEN BEGIN
     res_array = extractfeatures_rgb(REFORM(array[0,*,*]), REFORM(array[1,*,*]), REFORM(array[2,*,*]), REFORM(label_array[0,*,*]), max_label)
   ENDIF ELSE BEGIN
-    res_array =  MAKE_ARRAY(shape[1], 11, max_label+1, /FLOAT, VALUE = 0.0)
+    res_array =  MAKE_ARRAY(shape[1], 17, max_label+1, /FLOAT, VALUE = 0.0)
     FOR band = 0, shape[1]-1 DO BEGIN
       label_band = REFORM(label_array[band,*,*])
       label_band_max = max(max(label_band))
