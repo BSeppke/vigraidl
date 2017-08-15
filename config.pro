@@ -83,13 +83,12 @@ PRO CHECK_INSTALL
     CATCH, /CANCEL
   ENDIF
   
-  ;;Enable Auto-Build if the lib cannot be loaded:
-  test = CALL_EXTERNAL(dylib_path() , 'vigra_imagewidth_c', "foo.png",VALUE=[1], /CDECL, /AUTO_GLUE)
-
-  
   ;; For Windows: Add the dll directory to the systems path:
   IF !version.OS_FAMILY EQ 'Windows' THEN BEGIN
     !MAKE_DLL.LD = 'link /out:%L /nologo /dll %O /def:%E "' + !DLM_PATH + '\\idl.lib" msvcrt.lib legacy_stdio_definitions.lib %X'
     !PATH = !PATH + ";" + vigraidl_path()
   ENDIF
+
+  ;;Enable Auto-Build if the lib cannot be loaded:
+  test = CALL_EXTERNAL(dylib_path() , 'vigra_imagewidth_c', "foo.png",VALUE=[1], /CDECL, /AUTO_GLUE)
 END
