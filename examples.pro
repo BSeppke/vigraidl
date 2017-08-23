@@ -177,7 +177,7 @@ sep_x_kernel =  [ [1.0], $
 sep_y_kernel =  [ [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] ]/9.0
 
 img14 = convolveimage( img, gauss_kernel)
-img15 = convolveimage( img, mean_kernel)
+img15 = convolveimage( img, mean_kernel, 2) ;;Test for REPEAT border mode
 
 ; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
 IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
