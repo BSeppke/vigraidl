@@ -13,20 +13,10 @@ img = loadimage(vigraidl_path() + "images/lenna_face.png")
 shape = SIZE(img)
 
 PRINT, "testing image padding"
-; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
-IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
-  img_padd = paddimage(img, 10, 20, 30, 40,  [255.0 , 0.0 , 0.0])
-ENDIF ELSE BEGIN
-  img_padd = MAKE_ARRAY(shape[1],shape[2]+40,shape[3]+60, /FLOAT, VALUE=0.0)
-  img_padd[*,10:10+shape[2]-1,20:20+shape[3]-1] = img
-ENDELSE
+img_padd = paddimage(img, 10, 20, 30, 40,  [255.0 , 0.0 , 0.0])
 
 PRINT, "testing subimage and correlation facilities"
-IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
-  img_cut = subimage(img, 100, 50, 151, 101) ;;Mask needs to have odd size! Here 51x51
-ENDIF ELSE BEGIN
-  img_cut = img[*,100:150,100:150] ;;Mask needs to have odd size! Here 51x51
-ENDELSE
+img_cut = subimage(img, 100, 50, 151, 101) ;;Mask needs to have odd size! Here 51x51
 
 fcc_res = fastcrosscorrelation(img, img_cut)
 fncc_res = fastnormalizedcrosscorrelation(img, img_cut)
@@ -51,26 +41,21 @@ img2b = regionimagetocrackedgeimage( $
                             1.0))), $
                        0.0)
 
-; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
-IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
-  PRINT, "performing slic segmentation on lenna image"
-  img2_slic = regionimagetocrackedgeimage( slic(img), 0.0)
-ENDIF
+PRINT, "performing slic segmentation on lenna image"
+img2_slic = regionimagetocrackedgeimage( slic(img), 0.0)
 
 PRINT, "performing slic segmentation on the red channel of the lenna image"
 img2red_slic = regionimagetocrackedgeimage( slic(img[0,*,*]), 0.0)
 
-IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
-  PRINT, ""
-  PRINT, "extracting slic (RGB) segmentation stats for the red channel seg. of the lenna image"
-  img2_slic_stats = extractfeatures(img, slic(img[0,*,*]))
+PRINT, ""
+PRINT, "extracting slic (RGB) segmentation stats for the red channel seg. of the lenna image"
+img2_slic_stats = extractfeatures(img, slic(img[0,*,*]))
 
-  stats_shape = SIZE(img2_slic_stats)
+stats_shape = SIZE(img2_slic_stats)
 
-  FOR i=0, stats_shape[3]-1 DO BEGIN
-    PRINT, "Region", i, ":    Size: ", img2_slic_stats[0,0,i],"    Mean Color: (", img2_slic_stats[0,13,i], ",", img2_slic_stats[0,14,i], ",", img2_slic_stats[0,15,i], ")"
-  ENDFOR
-ENDIF
+FOR i=0, stats_shape[3]-1 DO BEGIN
+  PRINT, "Region", i, ":    Size: ", img2_slic_stats[0,0,i],"    Mean Color: (", img2_slic_stats[0,13,i], ",", img2_slic_stats[0,14,i], ",", img2_slic_stats[0,15,i], ")"
+ENDFOR
 
 PRINT, ""
 PRINT, "extracting slic (single-band) segmentation stats for the red channel seg. of the lenna image"
@@ -179,10 +164,7 @@ sep_y_kernel =  [ [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] ]/9.0
 img14 = convolveimage( img, gauss_kernel)
 img15 = convolveimage( img, mean_kernel, 2) ;;Test for REPEAT border mode
 
-; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
-IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
-  img16 = separableconvolveimage( img, sep_x_kernel, sep_y_kernel)
-ENDIF
+img16 = separableconvolveimage( img, sep_x_kernel, sep_y_kernel)
 
 img17 = medianfilter( img, 3, 3)
 
@@ -244,10 +226,7 @@ res = saveimage( img14,  result_path + "lenna-gauss-convolve.png")
 res = saveimage( img15,  result_path + "lenna-mean-convolve.png")
 res = saveimage( img17,  result_path + "lenna-medianfilter-3x3.png")
 
-;Non-created images, due to Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
-IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
-  res = saveimage(img2_slic, result_path + "lenna-slic.png")
-  res = saveimage( img16,  result_path + "lenna-sep-convolve.png")
-ENDIF
+res = saveimage(img2_slic, result_path + "lenna-slic.png")
+res = saveimage( img16,  result_path + "lenna-sep-convolve.png")
 
 end
