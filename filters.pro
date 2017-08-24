@@ -2,7 +2,7 @@
 ;###################            Generic convolution         ####################
 
 FUNCTION vigra_convolveimage_c, array, kernelMat, array2, width, height, kernel_width, kernel_height, border_treatment
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_convolveimage_c', array, DOUBLE(kernelMat), array2, FIX(width), FIX(height), FIX(kernel_width), FIX(kernel_height), FIX(border_treatment), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_convolveimage_c', array, DOUBLE(kernelMat), array2, LONG(width), LONG(height), LONG(kernel_width), LONG(kernel_height), LONG(border_treatment), $
               VALUE=[0,0,0,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -40,7 +40,7 @@ END
 ;###################            Separable convolution         ####################
 
 FUNCTION vigra_separableconvolveimage_c, array, kernel_x, kernel_y, array2, width, height, kernel_x_size, kernel_y_size, border_treatment
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_separableconvolveimage_c', array, DOUBLE(kernel_x), DOUBLE(kernel_y), array2, FIX(width), FIX(height), FIX(kernel_x_size), FIX(kernel_y_size), FIX(border_treatment), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_separableconvolveimage_c', array, DOUBLE(kernel_x), DOUBLE(kernel_y), array2, LONG(width), LONG(height), LONG(kernel_x_size), LONG(kernel_y_size), LONG(border_treatment), $
               VALUE=[0,0,0,0,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -78,7 +78,7 @@ END
 ;###############################################################################
 ;###################          Gaussian Smoothing            ####################
 FUNCTION vigra_gaussiansmoothing_c, array, array2, width, height, sigma
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_gaussiansmoothing_c', array, array2, FIX(width), FIX(height), FLOAT(sigma), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_gaussiansmoothing_c', array, array2, LONG(width), LONG(height), FLOAT(sigma), $
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -105,7 +105,7 @@ END
 ;###############################################################################
 ;###################        Gaussian Gradient (x&y)         ####################
 FUNCTION vigra_gaussiangradient_c, array, array2_x, array2_y, width, height, sigma
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_gaussiangradient_c', array, array2_x, array2_y, FIX(width), FIX(height), FLOAT(sigma), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_gaussiangradient_c', array, array2_x, array2_y, LONG(width), LONG(height), FLOAT(sigma), $
               VALUE=[0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -131,7 +131,7 @@ END
   ;###############################################################################
   ;###################      Gaussian Gradient (Magnitude)     ####################
 FUNCTION vigra_gaussiangradientmagnitude_c, array, array2, width, height, sigma
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_gaussiangradientmagnitude_c', array, array2, FIX(width), FIX(height), FLOAT(sigma), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_gaussiangradientmagnitude_c', array, array2, LONG(width), LONG(height), FLOAT(sigma), $
     VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -157,7 +157,7 @@ END
 ;###############################################################################
 ;###################        Laplacian Of Gaussian           ####################
 FUNCTION vigra_laplacianofgaussian_c, array, array2, width, height, scale
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_laplacianofgaussian_c', array, array2, FIX(width), FIX(height), FLOAT(scale), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_laplacianofgaussian_c', array, array2, LONG(width), LONG(height), FLOAT(scale), $
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -184,7 +184,7 @@ END
 ;###############################################################################
 ;#############    Hessian Matrix of 2. order deriv gaussians      ##############
 FUNCTION vigra_hessianmatrixofgaussian_c, array, array_xx,array_xy,array_yy, width, height, scale
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_hessianmatrixofgaussian_c', array, array_xx, array_xy, array_yy, FIX(width), FIX(height), FLOAT(scale), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_hessianmatrixofgaussian_c', array, array_xx, array_xy, array_yy, LONG(width), LONG(height), FLOAT(scale), $
               VALUE=[0,0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -210,7 +210,7 @@ END
 ;###############################################################################
 ;###################          Gaussian Sharpening           ####################
 FUNCTION vigra_gaussiansharpening_c, array, array2, width, height, sharpening_factor, scale
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_gaussiansharpening_c', array, array2, FIX(width), FIX(height), FLOAT(sharpening_factor), FLOAT(scale), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_gaussiansharpening_c', array, array2, LONG(width), LONG(height), FLOAT(sharpening_factor), FLOAT(scale), $
               VALUE=[0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -236,7 +236,7 @@ END
 ;###############################################################################
 ;###################            Simple Sharpening           ####################
 FUNCTION vigra_simplesharpening_c, array, array2, width, height, sharpening_factor
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_simplesharpening_c', array, array2, FIX(width), FIX(height), FLOAT(sharpening_factor), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_simplesharpening_c', array, array2, LONG(width), LONG(height), FLOAT(sharpening_factor), $
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -262,7 +262,7 @@ END
 ;###############################################################################
 ;###################            Median Filtering            ####################
 FUNCTION vigra_medianfilter_c, array, array2, width, height, window_width, window_height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_medianfilter_c', array, array2, FIX(width), FIX(height), FIX(window_width), FIX(window_height), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_medianfilter_c', array, array2, LONG(width), LONG(height), LONG(window_width), LONG(window_height), $
               VALUE=[0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -288,7 +288,7 @@ END
 ;###############################################################################
 ;###################          Nonlinear Diffusion           ####################
 FUNCTION vigra_nonlineardiffusion_c, array, array2, width, height, edge_threshold, scale
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_nonlineardiffusion_c', array, array2, FIX(width), FIX(height), FLOAT(edge_threshold), FLOAT(scale), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_nonlineardiffusion_c', array, array2, LONG(width), LONG(height), FLOAT(edge_threshold), FLOAT(scale), $
               VALUE=[0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -314,7 +314,7 @@ END
 ;###############################################################################
 ;###################             Shock Filter               ####################
 FUNCTION vigra_shockfilter_c, array, array2, width, height, sigma, rho, upwind_factor_h, iterations
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_shockfilter_c', array, array2, FIX(width), FIX(height), FLOAT(sigma), FLOAT(rho), FLOAT(upwind_factor_h), FIX(iterations), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_shockfilter_c', array, array2, LONG(width), LONG(height), FLOAT(sigma), FLOAT(rho), FLOAT(upwind_factor_h), LONG(iterations), $
               VALUE=[0,0,1,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 

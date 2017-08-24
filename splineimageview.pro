@@ -2,7 +2,7 @@
 ;###################           SplineImageView Creation     ####################
 
 FUNCTION vigra_create_splineimageview_c, array, width, height, degree
-    adr = CALL_EXTERNAL(dylib_path() , 'vigra_create_splineimageview' + STRTRIM(degree,1) +'_address_c', array, FIX(width), FIX(height), $
+    adr = CALL_EXTERNAL(dylib_path() , 'vigra_create_splineimageview' + STRTRIM(degree,1) +'_address_c', array, LONG(width), LONG(height), $
                           VALUE=[0,1,1], /L64_VALUE, /CDECL, /AUTO_GLUE)
     RETURN, adr
 END    

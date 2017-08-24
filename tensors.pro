@@ -1,7 +1,7 @@
 ;###############################################################################
 ;#############                   Structure Tensor                 ##############
 FUNCTION vigra_structuretensor_c, array, array_xx,array_xy,array_yy, width, height, inner_scale, outer_scale
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_structuretensor_c', array, array_xx, array_xy, array_yy, FIX(width), FIX(height), FLOAT(inner_scale),FLOAT(outer_scale), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_structuretensor_c', array, array_xx, array_xy, array_yy, LONG(width), LONG(height), FLOAT(inner_scale),FLOAT(outer_scale), $
     VALUE=[0,0,0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -27,7 +27,7 @@ END
 ;###############################################################################
 ;#############              Koethes Boundary Tensor               ##############
 FUNCTION vigra_boundarytensor_c, array, array_xx,array_xy,array_yy, width, height, scale
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_boundarytensor_c', array, array_xx, array_xy, array_yy, FIX(width), FIX(height), FLOAT(scale), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_boundarytensor_c', array, array_xx, array_xy, array_yy, LONG(width), LONG(height), FLOAT(scale), $
     VALUE=[0,0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -53,7 +53,7 @@ END
 ;###############################################################################
 ;############ Koethes Boundary Tensor (without 0th order response) #############
 FUNCTION vigra_boundarytensor1_c, array, array_xx,array_xy,array_yy, width, height, scale
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_boundarytensor1_c', array, array_xx, array_xy, array_yy, FIX(width), FIX(height), FLOAT(scale), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_boundarytensor1_c', array, array_xx, array_xy, array_yy, LONG(width), LONG(height), FLOAT(scale), $
     VALUE=[0,0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -79,7 +79,7 @@ END
 ;###############################################################################
 ;############          Tensor to Eigenvalue representation         #############
 FUNCTION vigra_tensoreigenrepresentation_c, array_xx,array_xy,array_yy, array2_xx,array2_xy,array2_yy, width, height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_tensoreigenrepresentation_c', array_xx, array_xy, array_yy, array2_xx, array2_xy, array2_yy, FIX(width), FIX(height), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_tensoreigenrepresentation_c', array_xx, array_xy, array_yy, array2_xx, array2_xy, array2_yy, LONG(width), LONG(height), $
     VALUE=[0,0,0,0,0,0,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -105,7 +105,7 @@ END
 ;###############################################################################
 ;############                     Tensor Trace                     #############
 FUNCTION vigra_tensortrace_c, array_xx,array_xy,array_yy, array2, width, height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_tensortrace_c', array_xx, array_xy, array_yy, array2, FIX(width), FIX(height), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_tensortrace_c', array_xx, array_xy, array_yy, array2, LONG(width), LONG(height), $
     VALUE=[0,0,0,0,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -131,7 +131,7 @@ END
 ;###############################################################################
 ;############          Tensor to Edge/Corner representation        #############
 FUNCTION vigra_tensortoedgecorner_c, array_xx,array_xy,array_yy, array2_xx,array2_xy,array2_yy, width, height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_tensortoedgecorner_c', array_xx, array_xy, array_yy, array2_xx, array2_xy, array2_yy, FIX(width), FIX(height), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_tensortoedgecorner_c', array_xx, array_xy, array_yy, array2_xx, array2_xy, array2_yy, LONG(width), LONG(height), $
     VALUE=[0,0,0,0,0,0,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -157,7 +157,7 @@ END
 ;###############################################################################
 ;############              Hourglass Filter of a Tensor            #############
 FUNCTION vigra_hourglassfilter_c, array_xx,array_xy,array_yy, array2_xx,array2_xy,array2_yy, width, height, sigma, rho
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_hourglassfilter_c', array_xx, array_xy, array_yy, array2_xx, array2_xy, array2_yy, FIX(width), FIX(height), FLOAT(sigma), FLOAT(rho), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_hourglassfilter_c', array_xx, array_xy, array_yy, array2_xx, array2_xy, array2_yy, LONG(width), LONG(height), FLOAT(sigma), FLOAT(rho), $
     VALUE=[0,0,0,0,0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 

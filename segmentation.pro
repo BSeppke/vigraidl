@@ -1,12 +1,12 @@
 ;###############################################################################
 ;###################         Label image                    ####################
 FUNCTION vigra_labelimage_c, array, array2, width, height, eight_connectivity
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_labelimage_c', array, array2, FIX(width), FIX(height), BOOLEAN(eight_connectivity), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_labelimage_c', array, array2, LONG(width), LONG(height), BOOLEAN(eight_connectivity), $
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
 FUNCTION vigra_labelimagewithbackground_c, array, array2, width, height, eight_connectivity, background
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_labelimagewithbackground_c', array, array2, FIX(width), FIX(height), BOOLEAN(eight_connectivity), FLOAT(background), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_labelimagewithbackground_c', array, array2, LONG(width), LONG(height), BOOLEAN(eight_connectivity), FLOAT(background), $
     VALUE=[0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -41,7 +41,7 @@ END
 ;###############################################################################
 ;###################      Watershed Transform (Union-Find)  ####################
 FUNCTION vigra_watershedsunionfind_c, array, array2, width, height, eight_connectivity
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_watershedsunionfind_c', array, array2, FIX(width), FIX(height), BOOLEAN(eight_connectivity),  $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_watershedsunionfind_c', array, array2, LONG(width), LONG(height), BOOLEAN(eight_connectivity),  $
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -71,7 +71,7 @@ END
 ;###############################################################################
 ;###################  Watershed Transform (Region-growing)  ####################
 FUNCTION vigra_watershedsregiongrowing_c, array, array2, width, height, eight_connectivity, keep_contours, use_turbo, stop_cost
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_watershedsregiongrowing_c', array, array2, FIX(width), FIX(height),  $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_watershedsregiongrowing_c', array, array2, LONG(width), LONG(height),  $
     BOOLEAN(eight_connectivity), BOOLEAN(keep_contours), BOOLEAN(use_turbo), DOUBLE(stop_cost), $
     VALUE=[0,0,1,1,1,1,1,1], /CDECL, /AUTO_GLUE)
 END
@@ -115,7 +115,7 @@ END
 ;###############################################################################
 ;###################       SLIC Segmentation Algorithm      ####################
 FUNCTION vigra_slic_gray_c, array, array2, width, height, seedDistance, intensityScaling, iterations
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_slic_gray_c', array, array2, FIX(width), FIX(height), FIX(seedDistance), DOUBLE(intensityScaling), FIX(iterations), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_slic_gray_c', array, array2, LONG(width), LONG(height), LONG(seedDistance), DOUBLE(intensityScaling), LONG(iterations), $
     VALUE=[0,0,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -134,7 +134,7 @@ FUNCTION slic_band, array, seedDistance, intensityScaling, iterations
 END
 
 FUNCTION vigra_slic_rgb_c, array_r, array_g, array_b, array2, width, height, seedDistance, intensityScaling, iterations
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_slic_rgb_c', array_r, array_g, array_b, array2, FIX(width), FIX(height), FIX(seedDistance), DOUBLE(intensityScaling), FIX(iterations), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_slic_rgb_c', array_r, array_g, array_b, array2, LONG(width), LONG(height), LONG(seedDistance), DOUBLE(intensityScaling), LONG(iterations), $
     VALUE=[0,0,0,0,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -172,7 +172,7 @@ END
 ;###############################################################################
 ;###################      Canny Edge-Detection              ####################
 FUNCTION vigra_cannyedgeimage_c, array, array2, width, height,scale, gradient_threshold, mark
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_cannyedgeimage_c', array, array2, FIX(width), FIX(height), FLOAT(scale), FLOAT(gradient_threshold), FLOAT(mark), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_cannyedgeimage_c', array, array2, LONG(width), LONG(height), FLOAT(scale), FLOAT(gradient_threshold), FLOAT(mark), $
               VALUE=[0,0,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -199,7 +199,7 @@ END
 ;###############################################################################
 ;################    Difference of Exponential Edge-Detection  #################
 FUNCTION vigra_differenceofexponentialedgeimage_c, array, array2, width, height,scale, gradient_threshold, mark
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_differenceofexponentialedgeimage_c', array, array2, FIX(width), FIX(height), FLOAT(scale), FLOAT(gradient_threshold), FLOAT(mark), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_differenceofexponentialedgeimage_c', array, array2, LONG(width), LONG(height), FLOAT(scale), FLOAT(gradient_threshold), FLOAT(mark), $
               VALUE=[0,0,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -227,7 +227,7 @@ END
 ;###############################################################################
 ;###################     RegionImage -> CrackEdgeImage      ####################
 FUNCTION vigra_regionimagetocrackedgeimage_c, array, array2, width, height,  mark
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_regionimagetocrackedgeimage_c', array, array2, FIX(width), FIX(height), FLOAT(mark), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_regionimagetocrackedgeimage_c', array, array2, LONG(width), LONG(height), FLOAT(mark), $
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -255,7 +255,7 @@ END
 ;###############################################################################
 ;###################     REGION-WISE FEATURE EXTRACTION     ####################
 FUNCTION vigra_extractfeatures_gray_c, array, array2, array3, width, height, max_label
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_extractfeatures_gray_c', array, array2, array3, FIX(width), FIX(height), FIX(max_label), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_extractfeatures_gray_c', array, array2, array3, LONG(width), LONG(height), LONG(max_label), $
     VALUE=[0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -274,7 +274,7 @@ FUNCTION extractfeatures_band, array, label_array, max_label
 END
 
 FUNCTION vigra_extractfeatures_rgb_c, array_r, array_g, array_b, array2, array3, width, height, max_label
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_extractfeatures_rgb_c', array_r, array_g, array_b, array2, array3, FIX(width), FIX(height), FIX(max_label), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_extractfeatures_rgb_c', array_r, array_g, array_b, array2, array3, LONG(width), LONG(height), LONG(max_label), $
     VALUE=[0,0,0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 

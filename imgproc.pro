@@ -1,7 +1,7 @@
 ;###############################################################################
 ;###################         Resize image                   ####################
 FUNCTION vigra_resizeimage_c, array, array2, width, height,  width2, height2, resize_mode
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_resizeimage_c', array, array2, FIX(width), FIX(height), FIX(width2), FIX(height2), FIX(resize_mode), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_resizeimage_c', array, array2, LONG(width), LONG(height), LONG(width2), LONG(height2), LONG(resize_mode), $
               VALUE=[0,0,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -28,7 +28,7 @@ END
 ;###############################################################################
 ;###################         Rotate image                   ####################
 FUNCTION vigra_rotateimage_c, array, array2, width, height, angle, resize_mode
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_rotateimage_c', array, array2, FIX(width), FIX(height), FLOAT(angle), FIX(resize_mode), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_rotateimage_c', array, array2, LONG(width), LONG(height), FLOAT(angle), LONG(resize_mode), $
               VALUE=[0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -56,7 +56,7 @@ END
 ;###################         Affine transform image         ####################
 
 FUNCTION vigra_affinewarpimage_c, array, affineMat, array2, width, height,  resize_mode
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_affinewarpimage_c', array, DOUBLE(affineMat), array2, FIX(width), FIX(height), FIX(resize_mode), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_affinewarpimage_c', array, DOUBLE(affineMat), array2, LONG(width), LONG(height), LONG(resize_mode), $
               VALUE=[0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -83,7 +83,7 @@ END
 ;###############################################################################
 ;###################         Reflect image                  ####################
 FUNCTION vigra_reflectimage_c, array, array2, width, height, reflect_mode
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_reflectimage_c', array, array2, FIX(width), FIX(height), FIX(reflect_mode), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_reflectimage_c', array, array2, LONG(width), LONG(height), LONG(reflect_mode), $
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -110,7 +110,7 @@ END
 ;###############################################################################
 ;###################         Fast Fourier Transform         ####################
 FUNCTION vigra_fouriertransform_c, array, array2, array3, width, height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fouriertransform_c', array, array2, array3, FIX(width), FIX(height),  $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fouriertransform_c', array, array2, array3, LONG(width), LONG(height),  $
               VALUE=[0,0,0,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -138,7 +138,7 @@ END
 ;###############################################################################
 ;###################     Inverse Fast Fourier Transform     ####################
 FUNCTION vigra_fouriertransforminverse_c, array, array2, array3, array4, width, height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fouriertransforminverse_c', array, array2, array3, array4, FIX(width), FIX(height),  $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fouriertransforminverse_c', array, array2, array3, array4, LONG(width), LONG(height),  $
     VALUE=[0,0,0,0,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -167,7 +167,7 @@ END
 ;###############################################################################
 ;###################         Fast cross correlation         ####################
 FUNCTION vigra_fastcrosscorrelation_c, array, array2, array3, width, height, mask_width, mask_height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fastcrosscorrelation_c', array, array2,  array3, FIX(width), FIX(height), FIX(mask_width), FIX(mask_height), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fastcrosscorrelation_c', array, array2,  array3, LONG(width), LONG(height), LONG(mask_width), LONG(mask_height), $
               VALUE=[0,0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -194,7 +194,7 @@ END
 ;###############################################################################
 ;###################   Fast normalized cross correlation    ####################
 FUNCTION vigra_fastnormalizedcrosscorrelation_c, array, array2, array3, width, height, mask_width, mask_height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fastnormalizedcrosscorrelation_c', array, array2,  array3, FIX(width), FIX(height), FIX(mask_width), FIX(mask_height), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_fastnormalizedcrosscorrelation_c', array, array2,  array3, LONG(width), LONG(height), LONG(mask_width), LONG(mask_height), $
               VALUE=[0,0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -221,7 +221,7 @@ END
 ;###############################################################################
 ;###################        Local maxima extraction         ####################
 FUNCTION vigra_localmaxima_c, array, array2, width, height, eight_connectivity
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localmaxima_c', array, array2, FIX(width), FIX(height), BOOLEAN(eight_connectivity), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localmaxima_c', array, array2, LONG(width), LONG(height), BOOLEAN(eight_connectivity), $
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -249,7 +249,7 @@ END
 ;###############################################################################
 ;###################        Local minima extraction         ####################
 FUNCTION vigra_localminima_c, array, array2, width, height, eight_connectivity
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localminima_c', array, array2, FIX(width), FIX(height), BOOLEAN(eight_connectivity),  $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localminima_c', array, array2, LONG(width), LONG(height), BOOLEAN(eight_connectivity),  $
               VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -277,7 +277,7 @@ END
 ;###############################################################################
 ;###################             Subimage                   ####################
 FUNCTION vigra_subimage_c, array, array2, width, height, left, upper, right, lower
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_subimage_c', array, array2, FIX(width), FIX(height), FIX(left), FIX(upper), FIX(right), FIX(lower),  $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_subimage_c', array, array2, LONG(width), LONG(height), LONG(left), LONG(upper), LONG(right), LONG(lower),  $
     VALUE=[0,0,1,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
@@ -308,7 +308,7 @@ END
 ;###############################################################################
 ;###################             Subimage                   ####################
 FUNCTION vigra_paddimage_c, array, array2, width, height, left, upper, right, lower, value
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_paddimage_c', array, array2, FIX(width), FIX(height), FIX(left), FIX(upper), FIX(right), FIX(lower), FLOAT(value), $
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_paddimage_c', array, array2, LONG(width), LONG(height), LONG(left), LONG(upper), LONG(right), LONG(lower), FLOAT(value), $
     VALUE=[0,0,1,1,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
