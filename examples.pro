@@ -15,7 +15,7 @@ shape = SIZE(img)
 PRINT, "testing image padding"
 ; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
 IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
-  img_padd = paddimage(img, 10, 20, 30, 40)
+  img_padd = paddimage(img, 10, 20, 30, 40,  [255.0 , 0.0 , 0.0])
 ENDIF ELSE BEGIN
   img_padd = MAKE_ARRAY(shape[1],shape[2]+40,shape[3]+60, /FLOAT, VALUE=0.0)
   img_padd[*,10:10+shape[2]-1,20:20+shape[3]-1] = img
@@ -236,6 +236,7 @@ res = saveimage( img7 ,  result_path + "lenna-disttransform-on-canny.png")
 res = saveimage( img8 ,  result_path + "lenna-diff_of_exp.png")
 res = saveimage( img9 ,  result_path + "lenna-gsmooth-3.0.png")
 res = saveimage( img10,  result_path + "lenna-log-3.0.png")
+res = saveimage( img_padd,  result_path + "lenna-padded.png")
 res = saveimage( img11,  result_path + "lenna-gsharpening-0.5-3.0.png")
 res = saveimage( img12,  result_path + "lenna-sharpening-3.0.png")
 res = saveimage( img13,  result_path + "lenna-nonlineardiffusion-0.1-2.0.png")
