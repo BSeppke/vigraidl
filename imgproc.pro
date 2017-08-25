@@ -308,8 +308,8 @@ END
 ;###############################################################################
 ;###################             Subimage                   ####################
 FUNCTION vigra_paddimage_c, array, array2, width, height, left, upper, right, lower, value
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_paddimage_c', array, array2, LONG(width), LONG(height), LONG(left), LONG(upper), LONG(right), LONG(lower), FLOAT(value), $
-    VALUE=[0,0,1,1,1,1,1,1,1],/CDECL, /AUTO_GLUE)
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_paddimage_c', array, array2, LONG(width), LONG(height), LONG(left), LONG(upper), LONG(right), LONG(lower), $
+    VALUE=[0,0,1,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
 FUNCTION paddimage_band, array, left, upper, right, lower, value
@@ -320,7 +320,7 @@ FUNCTION paddimage_band, array, left, upper, right, lower, value
   padd_width = right + w + left
   padd_height = lower + h + upper
   array2 = MAKE_ARRAY(padd_width, padd_height, /FLOAT, VALUE = value)
-  err = vigra_paddimage_c(array, array2, w, h, left, upper, right, lower, value)
+  err = vigra_paddimage_c(array, array2, w, h, left, upper, right, lower)
   CASE err OF
     0: RETURN, array2
     1: MESSAGE, "Error in vigraidl.imgproc:paddimage: Padded image extraction failed!!"
