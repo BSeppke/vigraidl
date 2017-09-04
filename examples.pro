@@ -134,14 +134,11 @@ img_bt = boundarytensor1(img, 1.0)
 ;tensor trace
 img_st_tt = tensortrace(img_st)
 
-; Causes Memory errors on Windows (bad_alloc on foreign (c) memory allocation)
-IF !version.OS_FAMILY EQ 'unix' THEN BEGIN
-  ;;tensor to eigen repr.
-  img_st_te  = tensoreigenrepresentation(img_st)
+;;tensor to eigen repr.
+img_st_te  = tensoreigenrepresentation(img_st)
   
-  ;tensor to edge corner
-  img_st_ec = tensortoedgecorner(img_st)
-ENDIF
+;tensor to edge corner
+img_st_ec = tensortoedgecorner(img_st)
 
 ;tensor to hourglass-filtered tensor
 img_st_hg = hourglassfilter(img_st, 1.0, 1.0)
@@ -226,7 +223,9 @@ res = saveimage( img14,  result_path + "lenna-gauss-convolve.png")
 res = saveimage( img15,  result_path + "lenna-mean-convolve.png")
 res = saveimage( img17,  result_path + "lenna-medianfilter-3x3.png")
 
+res = saveimage(img, result_path + "lenna-rescaled.png", 1) ; rescale from min...max to 0..255!
+res = saveimage(img, result_path + "lenna-pure.png",     0) ; clip to  to 0..255! If v>255 -> 255, if v<0 -> 0, else v.
 res = saveimage(img2_slic, result_path + "lenna-slic.png")
-res = saveimage( img16,  result_path + "lenna-sep-convolve.png")
+res = saveimage(img16,  result_path + "lenna-sep-convolve.png")
 
 end
