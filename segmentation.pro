@@ -259,12 +259,32 @@ FUNCTION vigra_extractfeatures_gray_c, array, array2, array3, width, height, max
     VALUE=[0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
+;The following features will be extracted for each region:
+;
+;  | Index         | Feature                                |
+;  | ------------- | -------------------------------------- |
+;  |  0            | region_size                            |
+;  |  1,  2        | upperleft-x and y-coord                |
+;  |  3,  4        | lowerright-x and y-coord               |
+;  |  5,  6        | mean-x and y-coord                     |
+;  |  7            | min grey value                         |
+;  |  8            | max grey value                         |
+;  |  9            | mean grey value                        |
+;  | 10            | std.dev. grey value                    |
+;  | 11, 12        | major ev: x and y-coord                |
+;  | 13, 14        | minor ev: x and y-coord                |
+;  | 15            | major ew                               |
+;  | 16            | minor ew                               |
+;  | 17, 18        | grey value weighted mean-x and y-coord |
+;  | 19            | perimeter (region contour length)      |
+;  | 20            | skewness                               |
+;  | 21            | kurtosis                               |
 FUNCTION extractfeatures_band, array, label_array, max_label
 
   IF N_ELEMENTS(max_label) EQ 0 THEN max_label=max(max(label_array))
   
   shape = SIZE(array)
-  array3 = MAKE_ARRAY(17, max_label+1, /FLOAT, VALUE = 0.0)
+  array3 = MAKE_ARRAY(22, max_label+1, /FLOAT, VALUE = 0.0)
   err = vigra_extractfeatures_gray_c(array, label_array, array3, shape[1], shape[2], max_label)
   IF err EQ 1 THEN BEGIN
     MESSAGE, "Error in vigraidl.segmentation.extractfeatures_band: Region-wise feature eaxtraction of image failed!"
@@ -278,12 +298,33 @@ FUNCTION vigra_extractfeatures_rgb_c, array_r, array_g, array_b, array2, array3,
     VALUE=[0,0,0,0,0,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
+; The following features will be extracted for each region:
+;
+;  | Index         | Feature                              |
+;  | ------------- | ------------------------------------ |
+;  |  0            | region_size                          |
+;  |  1,  2        | upperleft-x and y-coord              |
+;  |  3,  4        | lowerright-x and y-coord             |
+;  |  5,  6        | mean-x and y-coord                   |
+;  |  7,  8,  9    | min red,green,blue value             |
+;  | 10, 11, 12    | max red,green,blue value             |
+;  | 13, 14, 15    | mean red,green,blue value            |
+;  | 16, 17, 18    | std.dev. red,green,blue value        |
+;  | 19, 20        | major ev: x and y-coord              |
+;  | 21, 22        | minor ev: x and y-coord              |
+;  | 23            | major ew                             |
+;  | 24            | minor ew                             |
+;  | 25, 26        | luminace weighted mean-x and y-coord |
+;  |               | L = 0.3*R + 0.59*G + 0.11*B          |
+;  | 27            | perimeter (region contour length)    |
+;  | 28, 29, 30    | skewness (red, green, blue)          |
+;  | 31, 32, 33    | kurtosis (red, green, blue)          |
 FUNCTION extractfeatures_rgb, array_r, array_g, array_b, label_array, max_label
   
   IF N_ELEMENTS(max_label) EQ 0 THEN max_label=max(max(label_array))
   
   shape = SIZE(array_r)
-  array3 = MAKE_ARRAY(1,25, max_label+1, /FLOAT, VALUE = 0.0)
+  array3 = MAKE_ARRAY(1,34, max_label+1, /FLOAT, VALUE = 0.0)
   err = vigra_extractfeatures_rgb_c(array_r, array_g, array_b, label_array, array3, shape[1], shape[2], max_label)
   IF err EQ 1 THEN BEGIN
     MESSAGE, "Error in vigraidl.segmentation.extractfeatures_rgb: Region-wise feature eaxtraction of image failed!"
@@ -302,7 +343,7 @@ FUNCTION extractfeatures, array, label_array, max_label
   IF shape[0] EQ 3 AND shape[1] EQ 3 AND label_shape[0] EQ 3 AND Label_shape[1] EQ 1 THEN BEGIN
     res_array = extractfeatures_rgb(REFORM(array[0,*,*]), REFORM(array[1,*,*]), REFORM(array[2,*,*]), REFORM(label_array[0,*,*]), max_label)
   ENDIF ELSE BEGIN
-    res_array =  MAKE_ARRAY(shape[1], 17, max_label+1, /FLOAT, VALUE = 0.0)
+    res_array =  MAKE_ARRAY(shape[1], 22, max_label+1, /FLOAT, VALUE = 0.0)
     FOR band = 0, shape[1]-1 DO BEGIN
       label_band = REFORM(label_array[band,*,*])
       label_band_max = max(max(label_band))
