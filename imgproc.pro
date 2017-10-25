@@ -342,3 +342,31 @@ FUNCTION  paddimage, array, left, upper, right, lower, value
   ENDFOR
   RETURN, res_array
 END
+
+
+;###############################################################################
+;###################         Rotate image                   ####################
+FUNCTION vigra_clipimage_c, array, array2, width, height, low, upp
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_clipimage_c', array, array2, LONG(width), LONG(height), FLOAT(low), FLOAT(upp), $
+    VALUE=[0,0,1,1,1,1], /CDECL, /AUTO_GLUE)
+END
+
+FUNCTION clipimage_band, array, low, upp
+  IF N_Elements(low) EQ 0 THEN low = 0.0
+  IF N_Elements(upp) EQ 0 THEN upp = 255.0
+  shape = SIZE(array)
+  array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_clipimage_c(array, array2, shape[1], shape[2], low, upp)
+  IF err EQ 0 THEN RETURN, array2 ELSE MESSAGE, "Error in vigraidl.imgproc:clipimage: Clipping of image failed!!"
+END
+
+FUNCTION clipimage, array, low, upp
+  IF N_Elements(low) EQ 0 THEN low = 0.0
+  IF N_Elements(upp) EQ 0 THEN upp = 255.0
+  shape = SIZE(array)
+  res_array =  array
+  FOR band = 0, shape[1]-1 DO BEGIN
+    res_array[band,*,*] = clipimage_band(REFORM(array[band,*,*]), low, upp)
+  ENDFOR
+  RETURN, res_array
+END

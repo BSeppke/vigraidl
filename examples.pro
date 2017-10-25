@@ -104,7 +104,7 @@ t2mat = [ [1             ,  0            , 0], $
           [0             ,  1            , 0], $
           [shape[2]/2.0  , shape[3]/2.0  , 1] ]
 
-img6 =  affinewarpimage( img , t2mat # (rotmat # t1mat) ,  3)
+img6 =  clipimage(affinewarpimage( img , t2mat # (rotmat # t1mat) ,  3), 0.0, 255.0)
 
 
 
