@@ -342,7 +342,95 @@ FUNCTION shockfilter, array, sigma, rho, upwind_factor_h, iterations
   shape = SIZE(array)
   res_array =  array
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = shockfilter_band(REFORM(array[band,*,*]), sigma, rho, upwind_factor_h, iterations)
+  res_array[band,*,*] = shockfilter_band(REFORM(array[band,*,*]), sigma, rho, upwind_factor_h, iterations)
+  ENDFOR
+  RETURN, res_array
+END
+
+  ;###############################################################################
+  ;###################       Non-local Mean Filter            ####################
+FUNCTION vigra_nonlocalmean_c, array, array2, width, height, policy_type, sigma, meanVal, varRatio, epsilon, sigmaSpatial, searchRadius, patchRadius, sigmaMean, stepSize, iterations, nThreads, verbose
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_nonlocalmean_c', array, array2, LONG(width), LONG(height), $
+    LONG(policy_type), FLOAT(sigma), FLOAT(meanVal), FLOAT(varRatio), FLOAT(epsilon), $
+    FLOAT(sigmaSpatial), LONG(searchRadius), LONG(patchRadius), FLOAT(sigmaMean), $
+    LONG(stepSize), LONG(iterations), LONG(nThreads), BOOLEAN(verbose), $
+    VALUE=[0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], /CDECL, /AUTO_GLUE)
+END
+
+FUNCTION nonlocalmean_band, array, policy_type, sigma, meanVal, varRatio, epsilon, sigmaSpatial, searchRadius, patchRadius, sigmaMean, stepSize, iterations, nThreads, verbose
+
+  p_policy_type = 1
+  p_sigma = 50.0
+  p_meanVal = 5.0
+  p_varRatio = 0.5
+  p_epsilon = 0.00001
+  p_sigmaSpatial = 2.0
+  p_searchRadius = 5
+  p_patchRadius = 2
+  p_sigmaMean = 10.0
+  p_stepSize = 2
+  p_iterations = 2
+  p_nThreads = 8
+  p_verbose = 1
+
+  IF N_PARAMS() GT  1 THEN p_policy_type = policy_type
+  IF N_PARAMS() GT  2 THEN p_sigma = sigma
+  IF N_PARAMS() GT  3 THEN p_meanVal = meanVal
+  IF N_PARAMS() GT  4 THEN p_varRatio = varRatio
+  IF N_PARAMS() GT  5 THEN p_epsilon = epsilon
+  IF N_PARAMS() GT  6 THEN p_sigmaSpatial = sigmaSpatial
+  IF N_PARAMS() GT  7 THEN p_searchRadius = searchRadius
+  IF N_PARAMS() GT  8 THEN p_patchRadius = patchRadius
+  IF N_PARAMS() GT  9 THEN p_sigmaMean = sigmaMean
+  IF N_PARAMS() GT 10 THEN p_stepSize = stepSize
+  IF N_PARAMS() GT 11 THEN p_iterations = iterations
+  IF N_PARAMS() GT 12 THEN p_nThreads = nThreads
+  IF N_PARAMS() GT 13 THEN p_verbose = verbose
+
+  shape = SIZE(array)
+  array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
+  err = vigra_nonlocalmean_c(array, array2, shape[1], shape[2], p_policy_type, p_sigma, p_meanVal, p_varRatio, p_epsilon, p_sigmaSpatial, p_searchRadius, p_patchRadius, p_sigmaMean, p_stepSize, p_iterations, p_nThreads, p_verbose)
+  CASE err OF
+    0:  RETURN, array2
+    1:  MESSAGE, "Error in vigraidl.filters.nonlocalmean: Non-local mean filtering failed!!"
+    2:  MESSAGE, "Error in vigraidl.filters.nonlocalmean: Policy type must be either 0 or 1!"
+  ENDCASE
+END
+
+FUNCTION nonlocalmean, array, policy_type, sigma, meanVal, varRatio, epsilon, sigmaSpatial, searchRadius, patchRadius, sigmaMean, stepSize, iterations, nThreads, verbose
+ 
+  p_policy_type = 1
+  p_sigma = 50.0
+  p_meanVal = 5.0
+  p_varRatio = 0.5
+  p_epsilon = 0.00001
+  p_sigmaSpatial = 2.0
+  p_searchRadius = 5
+  p_patchRadius = 2
+  p_sigmaMean = 10.0
+  p_stepSize = 2
+  p_iterations = 2
+  p_nThreads = 8
+  p_verbose = 1
+  
+  IF N_PARAMS() GT  1 THEN p_policy_type = policy_type
+  IF N_PARAMS() GT  2 THEN p_sigma = sigma
+  IF N_PARAMS() GT  3 THEN p_meanVal = meanVal
+  IF N_PARAMS() GT  4 THEN p_varRatio = varRatio
+  IF N_PARAMS() GT  5 THEN p_epsilon = epsilon
+  IF N_PARAMS() GT  6 THEN p_sigmaSpatial = sigmaSpatial
+  IF N_PARAMS() GT  7 THEN p_searchRadius = searchRadius
+  IF N_PARAMS() GT  8 THEN p_patchRadius = patchRadius
+  IF N_PARAMS() GT  9 THEN p_sigmaMean = sigmaMean
+  IF N_PARAMS() GT 10 THEN p_stepSize = stepSize
+  IF N_PARAMS() GT 11 THEN p_iterations = iterations
+  IF N_PARAMS() GT 12 THEN p_nThreads = nThreads
+  IF N_PARAMS() GT 13 THEN p_verbose = verbose
+  
+  shape = SIZE(array)
+  res_array =  array
+  FOR band = 0, shape[1]-1 DO BEGIN
+    res_array[band,*,*] = nonlocalmean_band(REFORM(array[band,*,*]), p_policy_type, p_sigma, p_meanVal, p_varRatio, p_epsilon, p_sigmaSpatial, p_searchRadius, p_patchRadius, p_sigmaMean, p_stepSize, p_iterations, p_nThreads, p_verbose)
   ENDFOR
   RETURN, res_array
 END

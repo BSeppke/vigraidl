@@ -164,6 +164,8 @@ img15 = convolveimage( img, mean_kernel, 2) ;;Test for REPEAT border mode
 img16 = separableconvolveimage( img, sep_x_kernel, sep_y_kernel)
 
 img17 = medianfilter( img, 3, 3)
+img18 = shockfilter(img, 2.0, 6.0, 0.3, 5)
+img19 = nonlocalmean(img)
 
 
 PRINT, "testing the spline image view"
@@ -222,6 +224,8 @@ res = saveimage( img13,  result_path + "lenna-nonlineardiffusion-0.1-2.0.png")
 res = saveimage( img14,  result_path + "lenna-gauss-convolve.png")
 res = saveimage( img15,  result_path + "lenna-mean-convolve.png")
 res = saveimage( img17,  result_path + "lenna-medianfilter-3x3.png")
+res = saveimage( img18,  result_path + "lenna-shockfilter.png")
+res = saveimage( img19,  result_path + "lenna-nonlocalmean.png")
 
 res = saveimage(img, result_path + "lenna-rescaled.png", 1) ; rescale from min...max to 0..255!
 res = saveimage(img, result_path + "lenna-pure.png",     0) ; clip to  to 0..255! If v>255 -> 255, if v<0 -> 0, else v.
