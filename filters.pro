@@ -261,26 +261,35 @@ END
 
 ;###############################################################################
 ;###################            Median Filtering            ####################
-FUNCTION vigra_medianfilter_c, array, array2, width, height, window_width, window_height
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_medianfilter_c', array, array2, LONG(width), LONG(height), LONG(window_width), LONG(window_height), $
-              VALUE=[0,0,1,1,1,1],/CDECL, /AUTO_GLUE)
+FUNCTION vigra_medianfilter_c, array, array2, width, height, window_width, window_height, border_treatment
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_medianfilter_c', array, array2, LONG(width), LONG(height), LONG(window_width), LONG(window_height), LONG(border_treatment), $
+              VALUE=[0,0,1,1,1,1,1], /CDECL, /AUTO_GLUE)
 END
 
-FUNCTION medianfilter_band, array, window_width, window_height
+FUNCTION medianfilter_band, array, window_width, window_height, border_treatment
+
+  bt_mode = 5 ;;Zero padding by default
+  IF N_PARAMS() GT 3 THEN bt_mode = border_treatment
+
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_medianfilter_c(array, array2, shape[1], shape[2],  window_width, window_height)
+  err = vigra_medianfilter_c(array, array2, shape[1], shape[2],  window_width, window_height, bt_mode)
   CASE err OF
     0: RETURN, array2
     1: MESSAGE, "Error in vigraidl.filters.medianfilter: Median filtering failed!"
+    2: MESSAGE, "Error in vigraidl.filters.medianfilter: Border treatment mode must be in [0, 2, 3, 4, 5]!"
   ENDCASE
 END
 
-FUNCTION medianfilter, array, window_width, window_height
+FUNCTION medianfilter, array, window_width, window_height, border_treatment
+
+  bt_mode = 5 ;;Zero padding by default
+  IF N_PARAMS() GT 3 THEN bt_mode = border_treatment
+
   shape = SIZE(array)
   res_array =  array
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = medianfilter_band(REFORM(array[band,*,*]), window_width, window_height)
+	res_array[band,*,*] = medianfilter_band(REFORM(array[band,*,*]), window_width, window_height, bt_mode)
   ENDFOR
   RETURN, res_array
 END
