@@ -220,56 +220,76 @@ END
 
 ;###############################################################################
 ;###################        Local maxima extraction         ####################
-FUNCTION vigra_localmaxima_c, array, array2, width, height, eight_connectivity
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localmaxima_c', array, array2, LONG(width), LONG(height), BOOLEAN(eight_connectivity), $
-              VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
+FUNCTION vigra_localmaxima_c, array, array2, width, height, eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localmaxima_c', array, array2, LONG(width), LONG(height), BOOLEAN(eight_connectivity),  FLOAT(marker), FLOAT(threshold), BOOLEAN(allow_at_border), BOOLEAN(allow_plateaus), FLOAT(plateau_epsilon), $
+              VALUE=[0,0,1,1,1,1,1,1,1,1],/CDECL, /AUTO_GLUE)
 END
 
-FUNCTION localmaxima_band, array, eight_connectivity
+FUNCTION localmaxima_band, array, eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon
   IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
+  IF N_Elements(marker) EQ 0 THEN marker = 1
+  IF N_Elements(threshold) EQ 0 THEN threshold = -!VALUES.F_INFINITY
+  IF N_Elements(allow_at_border) EQ 0 THEN allow_at_border = 0
+  IF N_Elements(allow_plateaus) EQ 0 THEN allow_plateaus = 0
+  IF N_Elements(plateau_epsilon) EQ 0 THEN plateau_epsilon = 0.001
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_localmaxima_c(array, array2, shape[1], shape[2], eight_connectivity)
+  err = vigra_localmaxima_c(array, array2, shape[1], shape[2], eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon)
   CASE err OF
     0: RETURN, array2
     1: MESSAGE, "Error in vigraidl.imgproc:localmaxima: Extraction of local maxima of the image failed!!"
   ENDCASE
 END
 
-FUNCTION localmaxima, array, eight_connectivity
+FUNCTION localmaxima, array, eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon
   IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
+  IF N_Elements(marker) EQ 0 THEN marker = 1
+  IF N_Elements(threshold) EQ 0 THEN threshold = -!VALUES.F_INFINITY
+  IF N_Elements(allow_at_border) EQ 0 THEN allow_at_border = 0
+  IF N_Elements(allow_plateaus) EQ 0 THEN allow_plateaus = 0
+  IF N_Elements(plateau_epsilon) EQ 0 THEN plateau_epsilon = 0.001
   shape = SIZE(array)
   res_array =  array
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = localmaxima_band(REFORM(array[band,*,*]), eight_connectivity)
+	res_array[band,*,*] = localmaxima_band(REFORM(array[band,*,*]), eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon)
   ENDFOR
   RETURN, res_array
 END	  
 
 ;###############################################################################
 ;###################        Local minima extraction         ####################
-FUNCTION vigra_localminima_c, array, array2, width, height, eight_connectivity
-  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localminima_c', array, array2, LONG(width), LONG(height), BOOLEAN(eight_connectivity),  $
-              VALUE=[0,0,1,1,1],/CDECL, /AUTO_GLUE)
+FUNCTION vigra_localminima_c, array, array2, width, height, eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon
+  RETURN, CALL_EXTERNAL(dylib_path() , 'vigra_localminima_c', array, array2, LONG(width), LONG(height), BOOLEAN(eight_connectivity), FLOAT(marker), FLOAT(threshold), BOOLEAN(allow_at_border), BOOLEAN(allow_plateaus), FLOAT(plateau_epsilon), $
+              VALUE=[0,0,1,1,1,1,1,1,1,1], /CDECL, /AUTO_GLUE)
 END
 
-FUNCTION localminima_band, array, eight_connectivity
+FUNCTION localminima_band, array, eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon
   IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
+  IF N_Elements(marker) EQ 0 THEN marker = 1
+  IF N_Elements(threshold) EQ 0 THEN threshold = !VALUES.F_INFINITY
+  IF N_Elements(allow_at_border) EQ 0 THEN allow_at_border = 0
+  IF N_Elements(allow_plateaus) EQ 0 THEN allow_plateaus = 0
+  IF N_Elements(plateau_epsilon) EQ 0 THEN plateau_epsilon = 0.001
   shape = SIZE(array)
   array2 = MAKE_ARRAY(shape[1], shape[2], /FLOAT, VALUE = 0.0)
-  err = vigra_localminima_c(array, array2, shape[1], shape[2], eight_connectivity)
+  err = vigra_localminima_c(array, array2, shape[1], shape[2], eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon)
   CASE err OF
     0: RETURN, array2
     1: MESSAGE, "Error in vigraidl.imgproc:localminima: Extraction of local minima of the image failed!!"
   ENDCASE
 END
 
-FUNCTION localminima, array, eight_connectivity
+FUNCTION localminima, array, eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon
   IF N_Elements(eight_connectivity) EQ 0 THEN eight_connectivity = 1
-  shape = SIZE(array)
+  IF N_Elements(marker) EQ 0 THEN marker = 1
+  IF N_Elements(threshold) EQ 0 THEN threshold = !VALUES.F_INFINITY
+  IF N_Elements(allow_at_border) EQ 0 THEN allow_at_border = 0
+  IF N_Elements(allow_plateaus) EQ 0 THEN allow_plateaus = 0
+  IF N_Elements(plateau_epsilon) EQ 0 THEN plateau_epsilon = 0.001
+shape = SIZE(array)
   res_array =  array
   FOR band = 0, shape[1]-1 DO BEGIN
-	res_array[band,*,*] = localminima_band(REFORM(array[band,*,*]), eight_connectivity)
+	res_array[band,*,*] = localminima_band(REFORM(array[band,*,*]), eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon)
   ENDFOR
   RETURN, res_array
 END	  
